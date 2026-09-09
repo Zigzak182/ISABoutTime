@@ -176,33 +176,32 @@ Brief your crews to save their work area before leaving signal.
 
 ## Third-party requests
 
-Only `app/plot.html` reaches off-site:
+Only `app/plot.html` reaches off-site, and only for map imagery:
 
 | Resource | Host |
 |---|---|
-| Leaflet 1.9.4 CSS + JS | `cdnjs.cloudflare.com` |
-| Map tiles | `*.tile.openstreetmap.org` |
+| Map tiles | `tile.openstreetmap.org` |
 
-To eliminate the Leaflet dependency — worth doing for an offline field tool, since a crew
-that installs the app at the office and drives out of signal otherwise depends on that
-library having been cached:
+Leaflet is vendored into `assets/vendor/leaflet/` and served from your own origin, so there
+is no CDN dependency. There are no font hosts and no analytics anywhere on the site.
 
-```bash
-tools/vendor-leaflet.sh    # downloads Leaflet into assets/vendor/
-python3 tools/build.py     # switches the page and the precache to the local copy
+Because Leaflet is already vendored, a strict Content-Security-Policy is straightforward —
+`'self'` for everything except tile imagery:
+
+```
+default-src 'self';
+img-src 'self' data: https://tile.openstreetmap.org;
+script-src 'self';
+style-src 'self';
+connect-src 'self' https://tile.openstreetmap.org;
 ```
 
-Commit `assets/vendor/` along with the regenerated pages. After that the only cross-origin
-requests are map tiles, which makes a strict Content-Security-Policy straightforward.
+To upgrade Leaflet, change `VERSION` in `tools/vendor-leaflet.sh`, set `EXPECTED_SHA512=""`,
+run it once to print the hash, verify that hash against
+`https://registry.npmjs.org/leaflet/<version>` (the `dist.integrity` field minus the
+`sha512-` prefix), paste it into the script, then run the script and `tools/build.py` and
+commit both `assets/vendor/` and the regenerated `sw.js`.
 
 **OpenStreetMap tile usage policy:** the public tile servers are for light use only.
 Attribution is already rendered on the map. If TreePlot gets real traffic, move to a
 proper tile provider — the OSM Foundation's servers are donated infrastructure.
-
-Consider adding Subresource Integrity to the Leaflet tags once you can generate the
-hashes on a networked machine:
-
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
-        integrity="sha512-…" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-```

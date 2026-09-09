@@ -68,13 +68,14 @@ assets/js/  site.js         nav, storage, tabs, SW registration, offline badge
             plot.js         GPS capture, map, inventory, offline tiles, export
             contact.js      mailto composition
 assets/img/ PWA icons (generated from the brand mark)
+assets/vendor/leaflet/  Leaflet 1.9.4, vendored — no CDN at runtime
 data/       species.js      79 taxa with cultivars, tolerances, asset/liability cases
             zones.js        186 ZIP-prefix ranges → zone, region, moisture
             study.js        13 domains, 90 flashcards, 79 questions
 src/        page body fragments (the editable source of each page)
 tools/      build.py             stitches fragments, generates sw.js
             sw-template.js       service worker source
-            vendor-leaflet.sh    self-host Leaflet (removes the last CDN call)
+            vendor-leaflet.sh    re-vendor Leaflet from npm (integrity-pinned)
 docs/       DEPLOY.md  DATA.md
 ```
 
@@ -158,19 +159,26 @@ so the map still draws with no signal. It is capped at 1200 tiles per request, b
 OpenStreetMap Foundation's tile servers are donated infrastructure and bulk downloading is
 against their usage policy — zoom in and save a couple of smaller areas instead.
 
-### Removing the last third-party request
+### Leaflet is vendored, not CDN-loaded
 
-TreePlot loads Leaflet from cdnjs, which is a real weakness for an offline tool: a crew that
-installs the app at the office and drives somewhere with no signal depends on that library
-having been cached. The service worker warms it at install time to cover that, but the
-robust fix is to self-host:
+Loading the map library from a CDN would be a real weakness for an offline tool: a crew that
+installs the app at the office and drives somewhere with no signal would depend on that
+library having happened to be cached. So Leaflet 1.9.4 lives in `assets/vendor/leaflet/`
+and is precached with the rest of the shell.
+
+**Map tiles are the only cross-origin request the site makes.**
+
+`tools/vendor-leaflet.sh` is what put it there. It pulls from the npm registry — the
+authoritative publication that the CDNs mirror — and verifies the tarball against a pinned
+SHA-512 before extracting anything. Re-run it to upgrade:
 
 ```bash
-tools/vendor-leaflet.sh    # downloads Leaflet into assets/vendor/
-python3 tools/build.py     # detects it and switches the page + precache over
+tools/vendor-leaflet.sh    # verify + extract into assets/vendor/
+python3 tools/build.py     # refresh the precache list and version
 ```
 
-After that the site makes **no cross-origin requests at all** except map tiles.
+To move to a new Leaflet version, change `VERSION` in the script, set `EXPECTED_SHA512=""`,
+run it once to print the hash, verify that hash against the registry, then paste it in.
 
 ### Updating
 
@@ -210,5 +218,6 @@ Study progress and plotted trees are stored in `localStorage` under the `ttc:` p
 data stays on the device, is never transmitted, and **is lost if site data is cleared** —
 which is why TreePlot exports GeoJSON and CSV. There is no analytics on the tools.
 
-The only third-party requests are Leaflet from cdnjs and OpenStreetMap tiles, both on
-`app/plot.html` only.
+The only cross-origin request the site makes is OpenStreetMap map tiles, on `app/plot.html`
+only. Leaflet is vendored locally, and there is no CDN, font host, or analytics call
+anywhere on the site.

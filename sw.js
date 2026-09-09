@@ -19,7 +19,7 @@
    vendor  unversioned. Leaflet from the CDN.
    ============================================================ */
 
-var VERSION = "b060caa71d24";
+var VERSION = "a3a0aa739878";
 var SHELL = "ttc-shell-" + VERSION;
 var TILES = "ttc-tiles-v1";
 var VENDOR = "ttc-vendor-v1";
@@ -50,7 +50,14 @@ var PRECACHE = [
   "./index.html",
   "./manifest.webmanifest",
   "./platform.html",
-  "./services.html"
+  "./services.html",
+  "./assets/vendor/leaflet/images/layers-2x.png",
+  "./assets/vendor/leaflet/images/layers.png",
+  "./assets/vendor/leaflet/images/marker-icon-2x.png",
+  "./assets/vendor/leaflet/images/marker-icon.png",
+  "./assets/vendor/leaflet/images/marker-shadow.png",
+  "./assets/vendor/leaflet/leaflet.css",
+  "./assets/vendor/leaflet/leaflet.js"
 ];
 
 /* Cross-origin assets warmed at install. Empty when Leaflet has been
@@ -60,10 +67,7 @@ var PRECACHE = [
    Warming these at install rather than on first visit to the map page is the
    difference between "the map works offline" and "the map works offline only
    if you happened to open it while you still had signal." */
-var VENDOR_PRECACHE = [
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css",
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
-];
+var VENDOR_PRECACHE = [];
 
 /* Map imagery is the bulk of offline storage. At roughly 15 KB a tile this
    cap is on the order of 45 MB, which covers a large working area without

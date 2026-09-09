@@ -212,14 +212,23 @@ def build_service_worker():
     css_ref, js_ref, leaflet_local = leaflet_sources()
     vendor_urls = []
     if leaflet_local:
-        # Same-origin: fold it into the shell so it is versioned with everything else.
-        for rel in (css_ref, js_ref):
-            path = os.path.join(ROOT, rel)
-            if os.path.exists(path):
-                present.append(rel)
-                digest.update(rel.encode("utf-8"))
-                with open(path, "rb") as fh:
-                    digest.update(fh.read())
+        # Same-origin: fold it into the shell so it is versioned with everything
+        # else. Includes the images leaflet.css references — unused by TreePlot's
+        # divIcon markers today, but precaching them means a default marker or a
+        # layers control added later still works offline.
+        vendor_files = []
+        vendor_root = os.path.join(ROOT, LEAFLET_LOCAL)
+        for dirpath, _dirnames, filenames in os.walk(vendor_root):
+            for fn in sorted(filenames):
+                if os.path.splitext(fn)[1] not in (".js", ".css", ".png", ".svg"):
+                    continue  # LICENSE and VENDORED.txt are provenance, not runtime
+                abs_path = os.path.join(dirpath, fn)
+                vendor_files.append(os.path.relpath(abs_path, ROOT).replace(os.sep, "/"))
+        for rel in sorted(vendor_files):
+            present.append(rel)
+            digest.update(rel.encode("utf-8"))
+            with open(os.path.join(ROOT, rel), "rb") as fh:
+                digest.update(fh.read())
     else:
         # Cross-origin: warm it at install so the map library is present offline
         # regardless of which page the visitor happened to install from.
