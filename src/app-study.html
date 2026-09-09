@@ -1,0 +1,122 @@
+title: ISA Study Guide — True Tree Care
+desc: Free ISA Certified Arborist study platform — 13 knowledge domains, 90 flashcards and a 79-question practice exam with explanations.
+out: app/study.html
+nav: platform.html
+css: assets/css/app.css
+js: data/study.js assets/js/study.js
+
+<div class="app-head">
+  <div class="wrap">
+    <p class="eyebrow">Study platform</p>
+    <h1>ISA Certified Arborist study guide</h1>
+    <p class="lede">
+      Thirteen domains, 90 flashcards, 79 practice questions with explanations.
+      Progress stays in this browser.
+    </p>
+    <div class="app-tabs" id="studyTabs" role="tablist">
+      <button type="button" data-panel="panel-reference" role="tab">Reference</button>
+      <button type="button" data-panel="panel-cards" role="tab">Flashcards</button>
+      <button type="button" data-panel="panel-quiz" role="tab">Practice exam</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Reference ============ -->
+<section class="panel" id="panel-reference" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="split">
+      <aside class="card sticky-side">
+        <h2 style="font-size:1.05rem">How to use this</h2>
+        <p class="small muted">
+          Read a domain, then drill its flashcards, then take a practice session filtered to that
+          domain. Reading alone produces recognition; the drilling is what produces recall.
+        </p>
+        <p class="small muted">
+          The percentages are this platform's suggested study-time split. They are not official
+          exam weightings — ISA publishes its own domain structure, and you should work from that
+          alongside this.
+        </p>
+        <div class="notice tiny">
+          <strong>This is original material.</strong> It is organized around the ISA Certified
+          Arborist knowledge domains but it is not ISA content, is not endorsed by or affiliated
+          with ISA, and is not a substitute for the official study guide, the BMP series, or
+          supervised field experience.
+        </div>
+      </aside>
+
+      <div>
+        <h2 style="margin-bottom:.3rem">Knowledge domains</h2>
+        <p class="lede small" style="margin-bottom:1.4rem">
+          Expand a domain for its key points and terminology.
+        </p>
+        <div class="domain-list" id="domainList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Flashcards ============ -->
+<section class="panel" id="panel-cards" role="tabpanel" hidden>
+  <div class="wrap-narrow">
+    <div class="row" style="margin-bottom:1.4rem;justify-content:center">
+      <div style="min-width:220px">
+        <label for="fcDomain" class="sr-only">Filter by domain</label>
+        <select id="fcDomain"><option value="all">All domains</option></select>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="fcShuffle">Shuffle</button>
+    </div>
+
+    <div class="flashcard" id="flashcard" tabindex="0" role="button"
+         aria-label="Flashcard — activate to reveal the answer"></div>
+
+    <div class="progress" style="margin:1.4rem 0 1rem">
+      <span id="fcCount">0 / 0</span>
+      <span class="score-bar"><span id="fcBar" style="width:0%"></span></span>
+      <span id="fcKnown">0 marked known</span>
+    </div>
+
+    <div class="row" style="justify-content:center">
+      <button type="button" class="btn btn-ghost btn-sm" id="fcPrev">&larr; Previous</button>
+      <button type="button" class="btn btn-primary btn-sm" id="fcMark">Mark as known</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="fcNext">Next &rarr;</button>
+    </div>
+
+    <p class="tiny muted center" style="margin-top:1.2rem">
+      Keyboard: <span class="mono">Space</span> flips, <span class="mono">&larr;</span> and
+      <span class="mono">&rarr;</span> step through the deck.
+      <button type="button" class="btn btn-ghost btn-sm" id="fcReset" style="margin-left:.6rem">Reset known cards</button>
+    </p>
+  </div>
+</section>
+
+<!-- ============ Practice exam ============ -->
+<section class="panel" id="panel-quiz" role="tabpanel" hidden>
+  <div class="wrap">
+    <div class="split">
+      <aside class="card sticky-side">
+        <h2 style="font-size:1.05rem">New session</h2>
+        <div class="field">
+          <label for="qzDomain">Domain</label>
+          <select id="qzDomain"><option value="all">All domains</option></select>
+        </div>
+        <div class="field">
+          <label for="qzCount">Questions</label>
+          <select id="qzCount">
+            <option>10</option><option selected>20</option><option>40</option><option>79</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="qzStart" style="width:100%">Start session</button>
+        <p class="hint">
+          Answer choices are shuffled every session. The bank is authored with the correct answer in
+          a fixed slot, so shuffling is what stops you learning the position instead of the content.
+        </p>
+
+        <h2 style="font-size:1.05rem;margin-top:1.8rem">Recent sessions</h2>
+        <div id="quizHistory"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="qzClear" style="margin-top:.7rem">Clear history</button>
+      </aside>
+
+      <div class="card" id="quizBody"></div>
+    </div>
+  </div>
+</section>

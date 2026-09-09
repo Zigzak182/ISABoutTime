@@ -1,0 +1,131 @@
+title: Request an Assessment — True Tree Care
+desc: Request a tree risk assessment, pruning quote, planting plan or construction tree protection consultation from True Tree Care.
+js: assets/js/contact.js
+
+<section class="section" style="padding-bottom:1.5rem">
+  <div class="wrap-narrow">
+    <p class="eyebrow">Contact</p>
+    <h1>Request an assessment</h1>
+    <p class="lede">
+      Tell us what you are seeing. The more specific you are about the tree and what is
+      underneath it, the more useful the first visit will be.
+    </p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="split">
+      <aside class="card sticky-side">
+        <h2 style="font-size:1.1rem">Before you write</h2>
+        <p class="small muted">Three details save an entire site visit:</p>
+        <ul class="small muted" style="padding-left:1.1rem">
+          <li><strong>Rough trunk diameter</strong> measured at about 4.5 ft above the ground.</li>
+          <li><strong>What is underneath it</strong> — a driveway, a bedroom, a play set, a power line,
+            nothing at all. This is the single biggest factor in whether a defect matters.</li>
+          <li><strong>What changed recently</strong> — construction, a grade change, a new irrigation
+            system, a storm, mulch piled against the trunk.</li>
+        </ul>
+        <p class="small muted">A photo of the whole tree plus a photo of the base is worth more than
+          a paragraph of description.</p>
+
+        <div class="notice" style="margin-top:1.2rem">
+          <strong>If a limb is hanging or a tree is leaning into a target right now,</strong> do not
+          wait on a form. Keep people out of the area and call directly.
+        </div>
+      </aside>
+
+      <div>
+        <form id="contactForm" class="card">
+          <div class="grid grid-2" style="gap:0 1rem">
+            <div class="field">
+              <label for="cName">Your name</label>
+              <input id="cName" name="name" required autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="cEmail">Email</label>
+              <input id="cEmail" name="email" type="email" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="cPhone">Phone <span class="muted" style="font-weight:400">(optional)</span></label>
+              <input id="cPhone" name="phone" type="tel" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label for="cZip">Property ZIP code</label>
+              <input id="cZip" name="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cService">What do you need?</label>
+            <select id="cService" name="service">
+              <option value="Tree risk assessment">Tree risk assessment</option>
+              <option value="Pruning quote">Pruning quote</option>
+              <option value="Something is wrong with a tree">Something is wrong with a tree</option>
+              <option value="Removal quote">Removal quote</option>
+              <option value="Planting plan / species selection">Planting plan / species selection</option>
+              <option value="Construction tree protection">Construction tree protection</option>
+              <option value="Second opinion on another quote">Second opinion on another quote</option>
+            </select>
+          </div>
+
+          <div class="grid grid-2" style="gap:0 1rem">
+            <div class="field">
+              <label for="cCount">How many trees?</label>
+              <select id="cCount" name="count">
+                <option>1</option><option>2–4</option><option>5–10</option>
+                <option>More than 10</option><option>Whole property inventory</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cDbh">Approx. trunk diameter at 4.5 ft, in inches</label>
+              <input id="cDbh" name="dbh" type="number" min="1" max="120" step="1" placeholder="e.g. 24">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cTarget">What is under or beside the tree?</label>
+            <input id="cTarget" name="target" placeholder="House roof, driveway where we park, neighbor's fence, power line…">
+          </div>
+
+          <div class="field">
+            <label for="cNotes">What are you seeing?</label>
+            <textarea id="cNotes" name="notes" rows="5" placeholder="Mushrooms at the base since spring. Big limb split off in the July storm. Half the canopy leafed out late and the leaves are small…"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="cUrgency">Urgency</label>
+            <select id="cUrgency" name="urgency">
+              <option>Planning ahead — no rush</option>
+              <option>Within the next month</option>
+              <option>This week if possible</option>
+              <option>Something failed recently and I am worried</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <button type="submit" class="btn btn-primary">Compose the request</button>
+            <button type="button" class="btn btn-ghost" id="copyBtn">Copy as text</button>
+          </div>
+          <p class="hint" id="contactHint">
+            This opens your email client with the details filled in — nothing is transmitted from
+            this page, and nothing is stored.
+          </p>
+        </form>
+
+        <div class="card" style="margin-top:1.2rem" id="previewCard" hidden>
+          <h3 style="font-size:1rem">Request preview</h3>
+          <pre class="mono small" id="preview" style="white-space:pre-wrap;margin:0;color:var(--ink-soft)"></pre>
+        </div>
+
+        <div class="notice" style="margin-top:1.2rem">
+          <strong>Deploying this site?</strong> This form composes a <span class="mono">mailto:</span>
+          message because the site is static and has no server. Set the destination address in
+          <span class="mono">assets/js/contact.js</span>, or point the form at a form-handling service
+          if you would rather receive submissions in a dashboard. See
+          <span class="mono">docs/DEPLOY.md</span>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

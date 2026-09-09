@@ -1,0 +1,129 @@
+title: Planting Guide by ZIP Code — True Tree Care
+desc: Enter a ZIP code and describe the site to get ranked tree and cultivar recommendations, plus the species to refuse.
+out: app/planting.html
+nav: platform.html
+css: assets/css/app.css
+js: data/species.js data/zones.js assets/js/planting.js
+
+<div class="app-head">
+  <div class="wrap">
+    <p class="eyebrow">Selection tool</p>
+    <h1>What should I plant here?</h1>
+    <p class="lede">
+      A ZIP code gets you the climate. The site details get you the answer.
+    </p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="wrap">
+    <div class="split">
+
+      <form id="plantForm" class="card sticky-side">
+        <div class="field">
+          <label for="zip">ZIP code</label>
+          <input id="zip" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="27601" required>
+          <p class="hint" id="zipError" role="alert" hidden style="color:var(--risk-extreme)"></p>
+        </div>
+
+        <div class="field">
+          <label for="purpose">What is the tree for?</label>
+          <select id="purpose">
+            <option value="shade">Shade — cooling and canopy</option>
+            <option value="ornamental">Ornamental — flowers, bark, fall color</option>
+            <option value="screen">Screening or windbreak</option>
+            <option value="street">Street tree or parking island</option>
+            <option value="wildlife">Wildlife and native habitat</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="sun">Light at the planting spot</label>
+          <select id="sun">
+            <option value="full">Full sun — 6+ hours direct</option>
+            <option value="part">Part sun / part shade</option>
+            <option value="shade">Shade — under 3 hours direct</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="drainage">Soil moisture and drainage</label>
+          <select id="drainage">
+            <option value="well" selected>Well drained — normal</option>
+            <option value="moist">Consistently moist</option>
+            <option value="wet">Wet — standing water after rain</option>
+            <option value="dry">Dry — sandy, sloped, or droughty</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ph">Soil pH <span class="muted" style="font-weight:400">(if you have tested)</span></label>
+          <select id="ph">
+            <option value="">Not tested</option>
+            <option value="5.0">Strongly acid — around 5.0</option>
+            <option value="6.0">Slightly acid — around 6.0</option>
+            <option value="6.8">Near neutral — around 6.8</option>
+            <option value="7.5">Slightly alkaline — around 7.5</option>
+            <option value="8.2">Alkaline — 8.0 or above, limestone or fill</option>
+          </select>
+          <p class="hint">Worth $20 and a week. It is the single most useful number you can have.</p>
+        </div>
+
+        <div class="field">
+          <label for="salt">Salt exposure</label>
+          <select id="salt">
+            <option value="none">None</option>
+            <option value="moderate">Moderate — salted street or driveway nearby</option>
+            <option value="high">High — direct road spray or coastal salt</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="strip">Usable soil width, feet</label>
+          <input id="strip" type="number" min="2" max="80" step="1" value="12">
+          <p class="hint">The narrowest dimension of open soil — a 4 ft tree lawn between curb and walk is 4.</p>
+        </div>
+
+        <div class="field">
+          <label for="setback">Distance to the nearest building, feet</label>
+          <input id="setback" type="number" min="0" max="200" step="1" placeholder="Leave blank if open ground">
+          <p class="hint">Used to check mature spread against the setback.</p>
+        </div>
+
+        <div class="field">
+          <label class="small" style="font-weight:400"><input type="checkbox" id="utility" style="width:auto;margin-right:.4rem">Overhead utility lines above the spot</label>
+          <label class="small" style="font-weight:400"><input type="checkbox" id="compacted" style="width:auto;margin-right:.4rem">Compacted soil — construction fill, traffic, or hardpan</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%">Show recommendations</button>
+      </form>
+
+      <div id="plantResults">
+        <div class="card">
+          <h2 style="font-size:1.15rem">How this works</h2>
+          <p class="small muted">
+            The ZIP prefix resolves to an approximate USDA hardiness zone, a planting region and a
+            moisture regime. Every species in the database is then scored against your site:
+            hardiness margin, regional track record, mature size against overhead lines and setback,
+            rooting width, drainage, pH, salt and compaction tolerance, light, purpose, and longevity.
+          </p>
+          <p class="small muted">
+            Anything that fails a hard constraint is excluded and the reason is stated. Everything
+            else is ranked, and every card can be expanded to show exactly which factors moved its score.
+          </p>
+          <p class="small muted">
+            Results carry <strong>named cultivars</strong> where they matter — a male ginkgo, a
+            fruitless sweetgum, a narrow oak that fits an 8 ft strip. Handing a nursery a genus is
+            how a client ends up with a fruiting female ginkgo for the next fifty years.
+          </p>
+          <div class="notice">
+            <strong>A ZIP is a starting filter, not a site assessment.</strong> Elevation, urban heat
+            island, cold-air drainage and large water bodies all shift the real zone by half a zone or
+            more, and soil pH cannot be predicted from a ZIP code at all. Confirm on site, and soil-test
+            before anything expensive goes in the ground.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

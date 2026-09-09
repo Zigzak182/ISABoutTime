@@ -1,0 +1,139 @@
+title: TreePlot GPS — True Tree Care
+desc: Plot trees by precise GPS in the browser, record species, DBH, condition and risk, and export GeoJSON or CSV.
+out: app/plot.html
+nav: platform.html
+css: assets/css/app.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css
+js: https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js data/species.js assets/js/plot.js
+
+<div class="app-head">
+  <div class="wrap">
+    <p class="eyebrow">Field tool</p>
+    <h1>TreePlot GPS</h1>
+    <p class="lede">
+      Walk the property, drop a pin on every tree, export it into a real GIS.
+      Works on a phone in the field.
+    </p>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="wrap">
+
+    <div class="notice" id="plotFlash" hidden role="status"></div>
+
+    <div class="map-toolbar">
+      <button type="button" class="btn btn-ghost btn-sm" id="gpsBtn">Start GPS</button>
+      <button type="button" class="btn btn-primary btn-sm" id="plotHereBtn" disabled>Plot tree here</button>
+      <span class="gps-readout" id="gpsReadout">GPS off</span>
+      <button type="button" class="btn btn-ghost btn-sm" id="fitBtn">Fit to all trees</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn btn-ghost btn-sm" id="exportGeo">Export GeoJSON</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="exportCsv">Export CSV</button>
+      <label class="btn btn-ghost btn-sm" style="margin:0;font-weight:600">
+        Import GeoJSON
+        <input type="file" id="importFile" accept=".geojson,.json,application/geo+json,application/json"
+               style="position:absolute;width:1px;height:1px;opacity:0">
+      </label>
+      <button type="button" class="btn btn-ghost btn-sm" id="clearAll">Clear all</button>
+    </div>
+
+    <div class="split" style="grid-template-columns:1fr minmax(280px,340px)">
+      <div>
+        <div id="map"></div>
+        <p class="tiny muted" style="margin-top:.6rem">
+          Tap <strong>Plot tree here</strong> to use the GPS fix, or click anywhere on the map to
+          place a tree by eye. Pin colour follows condition. Click a pin for its record.
+        </p>
+      </div>
+
+      <aside>
+        <div class="stat-row" id="plotStats" style="margin-bottom:.8rem"></div>
+        <div class="notice tiny" id="diversityNote" hidden style="margin-bottom:.9rem"></div>
+        <h2 style="font-size:1rem">Inventory</h2>
+        <div class="tree-list" id="treeList"></div>
+      </aside>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:2rem">
+      <div class="card">
+        <h2 style="font-size:1.05rem">Accuracy, honestly</h2>
+        <p class="small muted">
+          A phone's GPS is typically good to somewhere between 3 and 10 metres under open sky, and
+          considerably worse under a closed canopy or between buildings — which is exactly where
+          street trees live. The accuracy radius is recorded with every point and exported in the
+          data, so downstream users can see what a fix was worth.
+        </p>
+        <p class="small muted mb0">
+          For survey-grade positions you want an external RTK or DGPS receiver feeding the device.
+          For an inventory where the goal is "find this tree again and know which one it is,"
+          phone GPS plus a species and DBH note is genuinely enough.
+        </p>
+      </div>
+      <div class="card">
+        <h2 style="font-size:1.05rem">Where your data lives</h2>
+        <p class="small muted">
+          In this browser, on this device, in localStorage. It is not uploaded anywhere and there
+          is no account behind it. That is a privacy feature and a data-loss risk in equal measure.
+        </p>
+        <p class="small muted mb0">
+          <strong>Export at the end of every site visit.</strong> Clearing site data, switching
+          browsers or using a private window will lose the inventory. GeoJSON opens directly in
+          QGIS or ArcGIS; CSV opens anywhere.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<dialog id="treeDialog">
+  <form id="treeForm" method="dialog">
+    <h2 style="font-size:1.15rem;margin-bottom:.2rem">Tree record</h2>
+    <p class="tiny mono muted" id="dialogCoords" style="margin-bottom:1rem"></p>
+    <input type="hidden" id="editId">
+
+    <div class="field">
+      <label for="tSpecies">Species</label>
+      <input id="tSpecies" list="speciesList" placeholder="Start typing, or enter anything">
+      <datalist id="speciesList"></datalist>
+    </div>
+
+    <div class="grid grid-2" style="gap:0 .8rem">
+      <div class="field">
+        <label for="tDbh">DBH, inches</label>
+        <input id="tDbh" type="number" min="0" max="200" step="0.5">
+      </div>
+      <div class="field">
+        <label for="tCondition">Condition</label>
+        <select id="tCondition">
+          <option value="excellent">Excellent</option>
+          <option value="good" selected>Good</option>
+          <option value="fair">Fair</option>
+          <option value="poor">Poor</option>
+          <option value="dead">Dead</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="tRisk">Risk rating</label>
+      <select id="tRisk">
+        <option value="low" selected>Low</option>
+        <option value="moderate">Moderate</option>
+        <option value="high">High</option>
+        <option value="extreme">Extreme</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="tNotes">Notes</label>
+      <textarea id="tNotes" rows="3" placeholder="Codominant union at 8 ft, included bark. Conk at base, north side."></textarea>
+    </div>
+
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-ghost btn-sm" id="deleteBtn" hidden
+              style="margin-right:auto;color:var(--risk-extreme)">Delete</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="cancelBtn">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-sm">Save tree</button>
+    </div>
+  </form>
+</dialog>
