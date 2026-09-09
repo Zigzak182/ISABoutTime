@@ -116,15 +116,63 @@ Netlify Forms is even simpler: add `netlify` and `name="contact"` to the `<form>
 
 ## Offline / field use
 
-TreePlot needs the network for Leaflet and map tiles. Without it the map area shows an
-explanatory message and **GPS capture, the inventory list, stats and export all still
-work** — so a crew in a dead zone can still collect data and export it later.
+The site ships a service worker (`sw.js`) and a web app manifest, so it installs to a home
+screen and every tool works with no connection.
 
-To make the whole site installable and genuinely offline-capable, add a service worker
-precaching the HTML, CSS, JS and `data/*.js`, plus a web app manifest. The site has no
-server dependency, so nothing else has to change.
+**Requirements:**
 
----
+- **HTTPS.** Service workers and geolocation both refuse to run otherwise (`localhost` is
+  exempt for development). GitHub Pages, Netlify and Cloudflare Pages all provide it.
+- **`sw.js` must be served from the site root.** A worker's scope cannot exceed its own
+  directory, and the app spans `/` and `/app/`. The build writes it to the root already —
+  don't move it into `assets/`.
+
+**Do not put a long cache lifetime on `sw.js`.** Browsers bypass the HTTP cache when
+checking for a worker update by default, so this is usually fine, but a CDN or host rule
+that forces a long `max-age` on all JS will strand users on an old version. If you set
+custom cache headers, exempt `sw.js`:
+
+```
+/sw.js
+  Cache-Control: no-cache
+```
+
+`manifest.webmanifest` should be served as `application/manifest+json`. GitHub Pages,
+Netlify and Cloudflare Pages all do this correctly out of the box.
+
+### After every deploy
+
+Run `python3 tools/build.py` and commit the regenerated pages **and `sw.js`**. The worker's
+version is a hash over the bytes of everything it precaches, so a forgotten rebuild means
+returning visitors keep getting the old app from cache. The CI snippet above catches stale
+pages; extend the `git diff` check to `sw.js` if you want it to catch that too:
+
+```bash
+git diff --exit-code -- '*.html' sw.js
+```
+
+### Verifying offline behaviour
+
+Truly test it — DevTools' "Offline" checkbox does not reliably gate service-worker fetches,
+so it is easy to convince yourself caching works when you are still hitting the network.
+Stop the server instead:
+
+```bash
+python3 -m http.server 8000     # load the site once, let the worker install
+# then kill the server and reload
+```
+
+All nine pages should still load, and the planting guide, risk assessment and study guide
+should all still function.
+
+### Map imagery
+
+Map tiles are the one thing that needs deliberate action. TreePlot's **Save map area
+offline** button caches the current view plus two zoom levels in, capped at 1200 tiles per
+request. Tiles fetched by normal panning are cached too, up to 3000 (~45 MB), trimmed
+oldest-first.
+
+Brief your crews to save their work area before leaving signal.
 
 ## Third-party requests
 
@@ -135,8 +183,17 @@ Only `app/plot.html` reaches off-site:
 | Leaflet 1.9.4 CSS + JS | `cdnjs.cloudflare.com` |
 | Map tiles | `*.tile.openstreetmap.org` |
 
-If you need a strict Content-Security-Policy or want zero third-party requests, vendor
-Leaflet into `assets/vendor/` and self-host tiles or switch to a commercial tile provider.
+To eliminate the Leaflet dependency — worth doing for an offline field tool, since a crew
+that installs the app at the office and drives out of signal otherwise depends on that
+library having been cached:
+
+```bash
+tools/vendor-leaflet.sh    # downloads Leaflet into assets/vendor/
+python3 tools/build.py     # switches the page and the precache to the local copy
+```
+
+Commit `assets/vendor/` along with the regenerated pages. After that the only cross-origin
+requests are map tiles, which makes a strict Content-Security-Policy straightforward.
 
 **OpenStreetMap tile usage policy:** the public tile servers are for light use only.
 Attribution is already rendered on the map. If TreePlot gets real traffic, move to a

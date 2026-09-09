@@ -2,8 +2,8 @@ title: TreePlot GPS — True Tree Care
 desc: Plot trees by precise GPS in the browser, record species, DBH, condition and risk, and export GeoJSON or CSV.
 out: app/plot.html
 nav: platform.html
-css: assets/css/app.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css
-js: https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js data/species.js assets/js/plot.js
+css: assets/css/app.css @leaflet-css
+js: @leaflet-js data/species.js assets/js/plot.js
 
 <div class="app-head">
   <div class="wrap">
@@ -35,6 +35,16 @@ js: https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js data/species
                style="position:absolute;width:1px;height:1px;opacity:0">
       </label>
       <button type="button" class="btn btn-ghost btn-sm" id="clearAll">Clear all</button>
+    </div>
+
+    <div class="map-toolbar" style="margin-top:-.2rem">
+      <button type="button" class="btn btn-ghost btn-sm" id="offlineBtn">Save map area offline</button>
+      <span class="gps-readout" id="tileStats">No offline maps saved</span>
+      <button type="button" class="btn btn-ghost btn-sm" id="clearTiles">Clear saved maps</button>
+      <span class="tiny muted" style="flex:1;min-width:220px">
+        Saves the current view (plus two zoom levels in) so it still draws with no signal.
+        Zoom to the work area first.
+      </span>
     </div>
 
     <div class="split" style="grid-template-columns:1fr minmax(280px,340px)">

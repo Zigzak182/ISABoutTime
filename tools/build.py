@@ -14,6 +14,8 @@ or a fragment:
     python3 tools/build.py
 """
 
+import hashlib
+import json
 import os
 import re
 import sys
@@ -28,6 +30,23 @@ BRAND_MARK = '''<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
         stroke-linecap="round" fill="none"/>
 </svg>'''
 
+# TreePlot's only third-party dependency. If someone has run
+# tools/vendor-leaflet.sh the local copy wins, which makes the site fully
+# self-hosted and guarantees the map library is available offline. Otherwise
+# we fall back to the CDN and the service worker warms it at install time.
+LEAFLET_CDN = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/"
+LEAFLET_LOCAL = "assets/vendor/leaflet/"
+
+
+def leaflet_sources():
+    """Return (css_ref, js_ref, is_local)."""
+    local_js = os.path.join(ROOT, LEAFLET_LOCAL, "leaflet.js")
+    local_css = os.path.join(ROOT, LEAFLET_LOCAL, "leaflet.css")
+    if os.path.exists(local_js) and os.path.exists(local_css):
+        return LEAFLET_LOCAL + "leaflet.css", LEAFLET_LOCAL + "leaflet.js", True
+    return LEAFLET_CDN + "leaflet.css", LEAFLET_CDN + "leaflet.js", False
+
+
 NAV_ITEMS = [
     ("index.html",     "Home"),
     ("services.html",  "Services"),
@@ -37,7 +56,7 @@ NAV_ITEMS = [
 ]
 
 SHELL = '''<!DOCTYPE html>
-<html lang="en" data-page="{slug}">
+<html lang="en" data-page="{slug}" data-base="{base}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -48,6 +67,10 @@ SHELL = '''<!DOCTYPE html>
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%B3%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
+<link rel="manifest" href="{base}manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="True Tree Care">
 <link rel="stylesheet" href="{base}assets/css/main.css">
 {extra_css}</head>
 <body>
@@ -147,6 +170,78 @@ def parse_fragment(path):
     return meta, body.strip()
 
 
+# Files the service worker precaches. Order is irrelevant; the hash is taken
+# over the sorted list so the version is stable across machines.
+PRECACHE_GLOBS = [
+    "index.html", "services.html", "about.html", "platform.html", "contact.html",
+    "app/risk.html", "app/planting.html", "app/study.html", "app/plot.html",
+    "assets/css/main.css", "assets/css/app.css",
+    "assets/js/site.js", "assets/js/risk.js", "assets/js/planting.js",
+    "assets/js/study.js", "assets/js/plot.js", "assets/js/contact.js",
+    "data/species.js", "data/zones.js", "data/study.js",
+    "assets/img/icon-192.png", "assets/img/icon-512.png",
+    "assets/img/icon-maskable-512.png", "assets/img/apple-touch-icon.png",
+    "manifest.webmanifest",
+]
+
+
+def build_service_worker():
+    """Generate sw.js with a precache list and a content-derived version.
+
+    Hashing the actual bytes means a copy edit in one fragment retires the
+    old cache automatically. Hand-maintained cache versions drift, and a
+    stale service worker is the single worst failure mode of an offline app.
+    """
+    template_path = os.path.join(ROOT, "tools", "sw-template.js")
+    if not os.path.exists(template_path):
+        print("  (no sw-template.js — skipping service worker)")
+        return None
+
+    digest = hashlib.sha256()
+    present = []
+    for rel in sorted(PRECACHE_GLOBS):
+        path = os.path.join(ROOT, rel)
+        if not os.path.exists(path):
+            print("  WARNING: precache target missing: %s" % rel)
+            continue
+        present.append(rel)
+        digest.update(rel.encode("utf-8"))
+        with open(path, "rb") as fh:
+            digest.update(fh.read())
+
+    css_ref, js_ref, leaflet_local = leaflet_sources()
+    vendor_urls = []
+    if leaflet_local:
+        # Same-origin: fold it into the shell so it is versioned with everything else.
+        for rel in (css_ref, js_ref):
+            path = os.path.join(ROOT, rel)
+            if os.path.exists(path):
+                present.append(rel)
+                digest.update(rel.encode("utf-8"))
+                with open(path, "rb") as fh:
+                    digest.update(fh.read())
+    else:
+        # Cross-origin: warm it at install so the map library is present offline
+        # regardless of which page the visitor happened to install from.
+        vendor_urls = [css_ref, js_ref]
+        digest.update("|".join(vendor_urls).encode("utf-8"))
+
+    version = digest.hexdigest()[:12]
+
+    # "./" so the worker resolves against its own scope and the site works
+    # from a subpath (a GitHub Pages project site) without reconfiguration.
+    urls = ["./"] + ["./" + rel for rel in present]
+
+    sw = open(template_path, encoding="utf-8").read()
+    sw = sw.replace("__VERSION__", version)
+    sw = sw.replace("__PRECACHE__", json.dumps(urls, indent=2))
+    sw = sw.replace("__VENDOR_PRECACHE__", json.dumps(vendor_urls, indent=2))
+
+    with open(os.path.join(ROOT, "sw.js"), "w", encoding="utf-8") as fh:
+        fh.write(sw)
+    return version, len(present)
+
+
 def main():
     if not os.path.isdir(SRC):
         sys.exit("missing src/ directory")
@@ -161,13 +256,19 @@ def main():
         # Active nav: an app page highlights Platform.
         active = meta.get("nav", os.path.basename(out_rel))
 
+        css_ref, js_ref, _local = leaflet_sources()
+
         extra_css = ""
         for href in meta.get("css", "").split():
+            if href == "@leaflet-css":
+                href = css_ref
             pre = "" if href.startswith("http") else base
             extra_css += '<link rel="stylesheet" href="%s%s">\n' % (pre, href)
 
         extra_js = ""
         for src in meta.get("js", "").split():
+            if src == "@leaflet-js":
+                src = js_ref
             pre = "" if src.startswith("http") else base
             extra_js += '<script src="%s%s"></script>\n' % (pre, src)
 
@@ -192,6 +293,14 @@ def main():
     print("built %d pages:" % len(written))
     for w in written:
         print("  " + w)
+
+    result = build_service_worker()
+    if result:
+        version, count = result
+        _, _, leaflet_local = leaflet_sources()
+        print("built sw.js: version %s, %d precached files" % (version, count))
+        print("leaflet: %s" % ("vendored locally (no third-party requests)" if leaflet_local
+                               else "CDN (run tools/vendor-leaflet.sh to self-host)"))
 
 
 if __name__ == "__main__":

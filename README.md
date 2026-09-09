@@ -47,7 +47,8 @@ Sessions are scored per domain and tell you where to spend the next hour.
 **`app/plot.html` — TreePlot GPS**
 Field inventory. Captures position from the device GPS (with the accuracy radius recorded)
 or from a map tap, alongside species, DBH, condition, risk and notes. Live 10-20-30
-diversity checking. Exports GeoJSON and CSV, and imports GeoJSON back.
+diversity checking. Exports GeoJSON and CSV, and imports GeoJSON back. Can save the current
+map view for offline use before you drive out to a site with no signal.
 
 ---
 
@@ -56,27 +57,32 @@ diversity checking. Exports GeoJSON and CSV, and imports GeoJSON back.
 ```
 index.html  services.html  about.html  platform.html  contact.html
 app/        risk.html  planting.html  study.html  plot.html
-assets/css/ main.css        design system, light + dark
+sw.js       GENERATED service worker — edit tools/sw-template.js
+manifest.webmanifest
+assets/css/ main.css        design system, light + dark, toasts
             app.css         platform tools, print styles
-assets/js/  site.js         nav, storage helpers, tabs, CSV/file download
+assets/js/  site.js         nav, storage, tabs, SW registration, offline badge
             risk.js         risk matrices + value ledger
             planting.js     species scoring against a resolved site
             study.js        reference / flashcards / practice exam
-            plot.js         GPS capture, map, inventory, import/export
+            plot.js         GPS capture, map, inventory, offline tiles, export
             contact.js      mailto composition
+assets/img/ PWA icons (generated from the brand mark)
 data/       species.js      79 taxa with cultivars, tolerances, asset/liability cases
             zones.js        186 ZIP-prefix ranges → zone, region, moisture
             study.js        13 domains, 90 flashcards, 79 questions
 src/        page body fragments (the editable source of each page)
-tools/      build.py        stitches fragments into the shared shell
+tools/      build.py             stitches fragments, generates sw.js
+            sw-template.js       service worker source
+            vendor-leaflet.sh    self-host Leaflet (removes the last CDN call)
 docs/       DEPLOY.md  DATA.md
 ```
 
 ### Editing pages
 
-The nine `.html` files at the top level and in `app/` are **generated** and committed, so
-the site deploys with no build step. Don't hand-edit them — edit the matching fragment in
-`src/` and regenerate:
+The nine `.html` files at the top level and in `app/`, plus `sw.js`, are **generated** and
+committed, so the site deploys with no build step. Don't hand-edit them — edit the matching
+fragment in `src/` (or `tools/sw-template.js`) and regenerate:
 
 ```bash
 python3 tools/build.py
@@ -116,6 +122,62 @@ Then run `python3 tools/build.py` and redeploy.
 
 ---
 
+## Offline and installable
+
+The site is a PWA. `sw.js` precaches the whole app — all nine pages, the CSS, the JS and
+the three data files — so every tool works with no connection at all: the ZIP planting
+guide, the risk assessment, the study guide, and TreePlot's capture, list and export.
+
+**`sw.js` is generated, and its version is a SHA-256 over the bytes of everything it
+precaches.** Any content change produces a new version and retires the old cache
+automatically. Hand-maintained cache versions drift, and a stale service worker is the
+worst failure mode an offline app has.
+
+Three caches, deliberately separated:
+
+| Cache | Lifetime | Contents |
+|---|---|---|
+| `ttc-shell-<hash>` | Retired on every deploy | Pages, CSS, JS, data, icons |
+| `ttc-tiles-v1` | Survives deploys | Map imagery, capped at 3000 tiles (~45 MB), trimmed FIFO |
+| `ttc-vendor-v1` | Survives deploys | Leaflet, when loaded from the CDN |
+
+Tiles survive deploys on purpose: a crew that cached a work area should not lose it
+because someone shipped a copy edit.
+
+Strategies are matched to the content. Navigations are network-first with a 3.5 s deadline
+(a field connection that is *present but useless* is worse than none — without a deadline
+every navigation hangs until TCP gives up) falling back to cache, then to the home page.
+Static assets are cache-first with background revalidation. Tiles are cache-first, and a
+missing tile offline returns a transparent 1×1 so Leaflet's grid stays intact instead of
+filling with broken-image icons.
+
+### Saving map areas
+
+TreePlot's **Save map area offline** button caches the current view plus two zoom levels in,
+so the map still draws with no signal. It is capped at 1200 tiles per request, because the
+OpenStreetMap Foundation's tile servers are donated infrastructure and bulk downloading is
+against their usage policy — zoom in and save a couple of smaller areas instead.
+
+### Removing the last third-party request
+
+TreePlot loads Leaflet from cdnjs, which is a real weakness for an offline tool: a crew that
+installs the app at the office and drives somewhere with no signal depends on that library
+having been cached. The service worker warms it at install time to cover that, but the
+robust fix is to self-host:
+
+```bash
+tools/vendor-leaflet.sh    # downloads Leaflet into assets/vendor/
+python3 tools/build.py     # detects it and switches the page + precache over
+```
+
+After that the site makes **no cross-origin requests at all** except map tiles.
+
+### Updating
+
+When a new version is deployed, the next visit shows a "A new version is ready — Reload"
+prompt rather than swapping content underneath someone mid-assessment. Nothing reloads
+unless the user asks.
+
 ## Accuracy and scope
 
 This matters more than the feature list.
@@ -140,8 +202,9 @@ This matters more than the feature list.
 ## Browser support and privacy
 
 Modern evergreen browsers. The site itself works with JavaScript disabled — only the tools
-need it. TreePlot needs an internet connection for map tiles and degrades to a usable
-non-map mode without one.
+need it. The service worker requires HTTPS (or `localhost`); without it everything still
+works, just without offline support. TreePlot degrades to a usable non-map mode when the
+map library or tiles are unavailable.
 
 Study progress and plotted trees are stored in `localStorage` under the `ttc:` prefix. That
 data stays on the device, is never transmitted, and **is lost if site data is cleared** —

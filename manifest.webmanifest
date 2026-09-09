@@ -1,0 +1,25 @@
+{
+  "name": "True Tree Care",
+  "short_name": "TreeCare",
+  "description": "Tree risk assessment, planting guidance by ZIP code, GPS tree plotting and an ISA study guide — all offline-capable.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbfaf7",
+  "theme_color": "#1e5631",
+  "categories": ["utilities", "productivity", "education"],
+  "icons": [
+    { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "TreePlot GPS", "short_name": "TreePlot", "url": "app/plot.html",
+      "description": "Plot trees by GPS in the field" },
+    { "name": "Liability vs. Asset", "short_name": "Assess", "url": "app/risk.html",
+      "description": "Rate a tree's risk and value" },
+    { "name": "Planting Guide", "short_name": "Planting", "url": "app/planting.html",
+      "description": "Find the right tree for a ZIP code" }
+  ]
+}

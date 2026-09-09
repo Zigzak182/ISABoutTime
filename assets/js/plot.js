@@ -59,7 +59,7 @@
 
     map = L.map("map", { zoomControl: true }).setView([39.5, -98.35], 4);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -386,6 +386,94 @@
     reader.readAsText(file);
   }
 
+  /* ---------- Offline map areas ---------- */
+
+  /* Standard slippy-map tile arithmetic. */
+  function lonToX(lon, z) { return Math.floor((lon + 180) / 360 * Math.pow(2, z)); }
+  function latToY(lat, z) {
+    var r = lat * Math.PI / 180;
+    return Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z));
+  }
+
+  /* Tiles covering the current view, from one zoom out (for context while
+     panning) to two zooms in (for detail at a tree). */
+  function tilesForView() {
+    if (!map) return [];
+    var b = map.getBounds();
+    var z0 = Math.max(1, map.getZoom() - 1);
+    var z1 = Math.min(19, map.getZoom() + 2);
+    var urls = [];
+
+    for (var z = z0; z <= z1; z++) {
+      var xMin = lonToX(b.getWest(), z), xMax = lonToX(b.getEast(), z);
+      var yMin = latToY(b.getNorth(), z), yMax = latToY(b.getSouth(), z);
+      var max = Math.pow(2, z) - 1;
+      for (var x = Math.max(0, xMin); x <= Math.min(max, xMax); x++) {
+        for (var y = Math.max(0, yMin); y <= Math.min(max, yMax); y++) {
+          urls.push("https://tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png");
+        }
+      }
+    }
+    return urls;
+  }
+
+  /* A hard ceiling, because the OpenStreetMap Foundation's tile servers are
+     donated infrastructure and bulk downloading is against their usage
+     policy. Zoom in and save a couple of smaller areas instead. */
+  var TILE_REQUEST_CAP = 1200;
+
+  function sw() {
+    return ("serviceWorker" in navigator) ? navigator.serviceWorker.controller : null;
+  }
+
+  function refreshTileStats() {
+    if (sw()) sw().postMessage({ type: "TILE_STATS" });
+  }
+
+  function saveArea() {
+    var btn = document.getElementById("offlineBtn");
+    if (!sw()) {
+      flash("Offline map saving needs the service worker, which requires HTTPS " +
+            "(or localhost) and one normal page load first. Reload and try again.", true);
+      return;
+    }
+    if (!map) { flash("The map is not loaded, so there is no area to save.", true); return; }
+    if (!navigator.onLine) { flash("You are offline — reconnect to download map imagery.", true); return; }
+
+    var urls = tilesForView();
+    if (urls.length > TILE_REQUEST_CAP) {
+      flash("That view needs " + urls.length.toLocaleString() + " map tiles, over the " +
+            TILE_REQUEST_CAP.toLocaleString() + " limit. Zoom in and save smaller areas — " +
+            "the tile servers are donated infrastructure.", true);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Saving 0/" + urls.length;
+    sw().postMessage({ type: "CACHE_TILES", urls: urls });
+  }
+
+  function onSwMessage(e) {
+    var d = e.data || {};
+    var btn = document.getElementById("offlineBtn");
+
+    if (d.type === "TILE_PROGRESS" && btn) {
+      btn.textContent = "Saving " + d.done + "/" + d.total;
+    } else if (d.type === "TILE_DONE") {
+      if (btn) { btn.disabled = false; btn.textContent = "Save map area offline"; }
+      flash("Saved " + (d.done - d.failed).toLocaleString() + " map tiles for offline use" +
+            (d.failed ? " (" + d.failed + " failed)" : "") + ".");
+      refreshTileStats();
+    } else if (d.type === "TILE_STATS") {
+      var el = document.getElementById("tileStats");
+      if (el) {
+        el.textContent = d.count
+          ? d.count.toLocaleString() + " tiles cached"
+          : "No offline maps saved";
+      }
+    }
+  }
+
   /* ---------- Init ---------- */
 
   function init() {
@@ -396,6 +484,21 @@
     renderList();
 
     document.getElementById("gpsBtn").addEventListener("click", startGPS);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("message", onSwMessage);
+      if (navigator.serviceWorker.controller) refreshTileStats();
+      else navigator.serviceWorker.ready.then(refreshTileStats);
+    }
+
+    document.getElementById("offlineBtn").addEventListener("click", saveArea);
+
+    document.getElementById("clearTiles").addEventListener("click", function () {
+      if (!sw()) { flash("No offline map cache to clear.", true); return; }
+      if (!confirm("Delete all saved offline map imagery? Your plotted trees are not affected.")) return;
+      sw().postMessage({ type: "CLEAR_TILES" });
+      flash("Offline map imagery cleared.");
+    });
+
     document.getElementById("fitBtn").addEventListener("click", function () {
       if (!trees.length) { flash("Nothing plotted yet.", true); return; }
       fitAll();
