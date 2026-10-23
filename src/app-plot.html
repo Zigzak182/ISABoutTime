@@ -17,37 +17,43 @@ js: @leaflet-js data/species.js assets/js/plot.js
 </div>
 
 <section class="panel">
-  <div class="wrap">
+  <div class="wrap plot-layout">
 
     <div class="notice" id="plotFlash" hidden role="status"></div>
 
-    <div class="map-toolbar">
+    <!-- Capture: the two controls used constantly in the field. -->
+    <div class="map-toolbar tb-capture">
       <button type="button" class="btn btn-ghost btn-sm" id="gpsBtn">Start GPS</button>
       <button type="button" class="btn btn-primary btn-sm" id="plotHereBtn" disabled>Plot tree here</button>
       <span class="gps-readout" id="gpsReadout">GPS off</span>
-      <button type="button" class="btn btn-ghost btn-sm" id="fitBtn">Fit to all trees</button>
-      <span style="flex:1"></span>
-      <button type="button" class="btn btn-ghost btn-sm" id="exportGeo">Export GeoJSON</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="exportCsv">Export CSV</button>
-      <label class="btn btn-ghost btn-sm" style="margin:0;font-weight:600">
-        Import GeoJSON
-        <input type="file" id="importFile" accept=".geojson,.json,application/geo+json,application/json"
-               style="position:absolute;width:1px;height:1px;opacity:0">
-      </label>
-      <button type="button" class="btn btn-ghost btn-sm" id="clearAll">Clear all</button>
     </div>
 
-    <div class="map-toolbar" style="margin-top:-.2rem">
+    <!-- Offline maps: done once, before leaving signal. -->
+    <div class="map-toolbar tb-offline">
       <button type="button" class="btn btn-ghost btn-sm" id="offlineBtn">Save map area offline</button>
-      <span class="gps-readout" id="tileStats">No offline maps saved</span>
       <button type="button" class="btn btn-ghost btn-sm" id="clearTiles">Clear saved maps</button>
-      <span class="tiny muted" style="flex:1;min-width:220px">
+      <span class="gps-readout" id="tileStats">No offline maps saved</span>
+      <span class="toolbar-note full">
         Saves the current view (plus two zoom levels in) so it still draws with no signal.
         Zoom to the work area first.
       </span>
     </div>
 
-    <div class="split" style="grid-template-columns:1fr minmax(280px,340px)">
+    <!-- Data management: occasional. -->
+    <div class="map-toolbar tb-data">
+      <button type="button" class="btn btn-ghost btn-sm" id="fitBtn">Fit to all trees</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="exportGeo">Export GeoJSON</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="exportCsv">Export CSV</button>
+      <label class="btn btn-ghost btn-sm" style="margin:0;font-weight:600">
+        Import GeoJSON
+        <input type="file" id="importFile" class="visually-hidden"
+               accept=".geojson,.json,application/geo+json,application/json">
+      </label>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost btn-sm full" id="clearAll">Clear all trees</button>
+    </div>
+
+    <div class="split split-main-first">
       <div>
         <div id="map"></div>
         <p class="tiny muted" style="margin-top:.6rem">
@@ -57,6 +63,7 @@ js: @leaflet-js data/species.js assets/js/plot.js
       </div>
 
       <aside>
+        <h2 class="sr-only">Inventory summary</h2>
         <div class="stat-row" id="plotStats" style="margin-bottom:.8rem"></div>
         <div class="notice tiny" id="diversityNote" hidden style="margin-bottom:.9rem"></div>
         <h2 style="font-size:1rem">Inventory</h2>
@@ -64,7 +71,7 @@ js: @leaflet-js data/species.js assets/js/plot.js
       </aside>
     </div>
 
-    <div class="grid grid-2" style="margin-top:2rem">
+    <div class="grid grid-2 plot-notes" style="margin-top:2rem">
       <div class="card">
         <h2 style="font-size:1.05rem">Accuracy, honestly</h2>
         <p class="small muted">

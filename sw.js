@@ -19,7 +19,7 @@
    vendor  unversioned. Leaflet from the CDN.
    ============================================================ */
 
-var VERSION = "a3a0aa739878";
+var VERSION = "11240bf5deaf";
 var SHELL = "ttc-shell-" + VERSION;
 var TILES = "ttc-tiles-v1";
 var VENDOR = "ttc-vendor-v1";

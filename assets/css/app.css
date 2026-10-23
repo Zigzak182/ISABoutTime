@@ -13,6 +13,10 @@
   border-radius: 999px; padding: .38rem .85rem; font: inherit; font-size: .85rem;
   font-weight: 600; cursor: pointer; text-decoration: none;
 }
+@media (max-width: 860px) {
+  .app-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; }
+  .app-tabs button, .app-tabs a { padding: .6rem .4rem; text-align: center; min-height: 42px; }
+}
 .app-tabs button:hover, .app-tabs a:hover { background: var(--surface); color: var(--ink); }
 .app-tabs [aria-selected="true"], .app-tabs .is-active {
   background: var(--canopy); border-color: var(--canopy); color: #fff;
@@ -24,12 +28,32 @@
 
 /* ---------- Split layout: controls + results ---------- */
 .split { display: grid; gap: 1.5rem; align-items: start; grid-template-columns: minmax(280px, 340px) 1fr; }
-@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+/* Main content first, aside second — used by TreePlot so the map leads.
+   This must be a class, not an inline style: an inline grid-template-columns
+   outranks the media query below and strands the layout in two columns on a
+   phone, which squashes the map to a sliver. */
+.split-main-first { grid-template-columns: 1fr minmax(280px, 340px); }
 .sticky-side { position: sticky; top: 82px; }
-@media (max-width: 860px) { .sticky-side { position: static; } }
+
+@media (max-width: 860px) {
+  .split, .split-main-first { grid-template-columns: 1fr; gap: 1.1rem; }
+  .sticky-side { position: static; }
+}
 
 /* ---------- Risk matrix ---------- */
 .matrix { border-collapse: collapse; width: 100%; font-size: .8rem; }
+@media (max-width: 600px) {
+  /* Fixed layout forces the table to the container width instead of letting
+     "Significant" set a min-content floor that pushes the matrix into a
+     horizontal scroll nobody notices. Long words break with hyphens rather
+     than being abbreviated — the rating names need to stay readable. */
+  .matrix { font-size: .64rem; table-layout: fixed; width: 100%; }
+  .matrix th, .matrix td {
+    padding: .3rem .18rem;
+    hyphens: auto; overflow-wrap: break-word; word-break: break-word;
+  }
+  .matrix th:first-child { width: 26%; }
+}
 .matrix th, .matrix td { border: 1px solid var(--line); padding: .45rem .4rem; text-align: center; }
 .matrix th { background: var(--surface-alt); font-size: .68rem; }
 .matrix td { font-weight: 650; color: #fff; }
@@ -60,6 +84,11 @@
 /* ---------- Flashcards ---------- */
 .flashcard {
   perspective: 1400px; width: 100%; max-width: 620px; margin-inline: auto; height: 300px; cursor: pointer;
+}
+@media (max-width: 600px) {
+  .flashcard { height: 360px; }
+  .flashcard-face { padding: 1.2rem; }
+  .flashcard-face .q { font-size: 1.08rem; }
 }
 .flashcard-inner {
   position: relative; width: 100%; height: 100%; transition: transform .5s cubic-bezier(.2,.7,.3,1);
@@ -93,6 +122,7 @@
 .choice.is-wrong { border-color: var(--risk-extreme); background: color-mix(in srgb, var(--risk-extreme) 12%, transparent); }
 .choice.is-wrong .key { background: var(--risk-extreme); color: #fff; border-color: var(--risk-extreme); }
 .choice[disabled] { cursor: default; }
+@media (max-width: 860px) { .choice { min-height: 52px; padding: .85rem .9rem; } }
 
 .explain { border-left: 3px solid var(--canopy); padding: .8rem 1rem; background: var(--surface-alt);
            border-radius: 0 var(--r) var(--r) 0; font-size: .9rem; margin-top: .6rem; }
@@ -147,6 +177,35 @@
 #map { height: min(68vh, 620px); border-radius: var(--r-lg); border: 1px solid var(--line); z-index: 1; }
 .leaflet-container { font: inherit; border-radius: var(--r-lg); background: var(--surface-alt); }
 .map-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; align-items: center; }
+.map-toolbar .spacer { flex: 1; }
+#plotFlash { margin-bottom: .8rem; }
+.toolbar-note { font-size: .76rem; color: var(--ink-faint); }
+
+@media (max-width: 860px) {
+  /* Stack: map, then stats, then inventory — the order you work in. */
+  #map { height: 50vh; min-height: 280px; }
+
+  /* A flex-wrap toolbar produces ragged rows of odd-width buttons. An explicit
+     two-column grid keeps every control the same size and thumb-reachable. */
+  .map-toolbar { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
+  .map-toolbar .btn { width: 100%; }
+  .map-toolbar .spacer { display: none; }
+  .map-toolbar .full { grid-column: 1 / -1; }
+  .gps-readout { grid-column: 1 / -1; text-align: center; padding: .5rem .6rem; }
+  .toolbar-note { grid-column: 1 / -1; }
+  .tree-list { max-height: none; }
+
+  /* Put the map directly under the capture controls. Source order suits a wide
+     screen, where the toolbars sit above a side-by-side map; on a phone they
+     stack, and nobody should scroll past seven buttons to reach the map. */
+  .plot-layout { display: flex; flex-direction: column; }
+  .plot-layout > #plotFlash   { order: 0; margin-bottom: .8rem; }
+  .plot-layout > .tb-capture  { order: 1; }
+  .plot-layout > .split       { order: 2; }
+  .plot-layout > .tb-offline  { order: 3; margin-top: 1.2rem; }
+  .plot-layout > .tb-data     { order: 4; }
+  .plot-layout > .plot-notes  { order: 5; }
+}
 .gps-readout { font-family: var(--mono); font-size: .8rem; color: var(--ink-soft);
                background: var(--surface-alt); padding: .35rem .6rem; border-radius: var(--r-sm);
                border: 1px solid var(--line); }
@@ -175,7 +234,9 @@
 dialog {
   border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); color: var(--ink);
   padding: 1.5rem; max-width: 540px; width: calc(100% - 2rem); box-shadow: var(--shadow-lg);
+  max-height: 85vh; overflow-y: auto;
 }
+@media (max-width: 480px) { dialog { padding: 1.1rem; width: calc(100% - 1.2rem); } }
 dialog::backdrop { background: rgba(20,18,14,.5); backdrop-filter: blur(2px); }
 
 /* ---------- Print ----------

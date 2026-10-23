@@ -102,6 +102,10 @@ a:hover { color: var(--canopy-lit); }
 
 .wrap { width: min(100% - 2.5rem, var(--wrap)); margin-inline: auto; }
 .wrap-narrow { width: min(100% - 2.5rem, 780px); margin-inline: auto; }
+/* Narrow phones need that 40px of gutter back for content. */
+@media (max-width: 480px) {
+  .wrap, .wrap-narrow { width: min(100% - 1.6rem, var(--wrap)); }
+}
 .section { padding: clamp(3rem, 7vw, 5.5rem) 0; }
 .section-tight { padding: clamp(2rem, 4vw, 3rem) 0; }
 
@@ -163,6 +167,10 @@ a:hover { color: var(--canopy-lit); }
 .btn-ghost { background: transparent; border-color: var(--line-strong); color: var(--ink); }
 .btn-ghost:hover { background: var(--surface-alt); color: var(--ink); }
 .btn-sm { padding: .45rem .8rem; font-size: .84rem; }
+@media (max-width: 860px) {
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 40px; }
+}
 .btn[disabled] { opacity: .45; cursor: not-allowed; }
 
 /* ---------- Cards / surfaces ---------- */
@@ -172,9 +180,17 @@ a:hover { color: var(--canopy-lit); }
 }
 .card h3 { margin-top: 0; }
 .grid { display: grid; gap: 1.1rem; }
-.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.grid-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-.grid-4 { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+/* min() on the track floor is what stops a narrow phone scrolling sideways:
+   a bare minmax(300px, 1fr) refuses to shrink below 300px, so any container
+   narrower than that overflows instead of collapsing to one column. */
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); }
+
+/* Grid and flex children default to min-width:auto, which floors a track at the
+   child's min-content width. One long <option> or an unbreakable string then
+   widens the whole page. */
+.grid > *, .split > *, .row > * { min-width: 0; }
 
 .pill {
   display: inline-flex; align-items: center; gap: .35rem;
@@ -189,10 +205,15 @@ a:hover { color: var(--canopy-lit); }
 /* ---------- Forms ---------- */
 label { display: block; font-size: .82rem; font-weight: 650; color: var(--ink-soft); margin-bottom: .3rem; }
 input, select, textarea {
-  width: 100%; padding: .6rem .7rem; font: inherit; font-size: .93rem;
+  width: 100%; min-width: 0; padding: .6rem .7rem; font: inherit; font-size: .93rem;
   color: var(--ink); background: var(--surface);
   border: 1px solid var(--line-strong); border-radius: var(--r-sm);
 }
+/* Without this a long option ("Improbable — not likely to fail in normal
+   conditions") sets the control's min-content width and blows out the layout. */
+select { text-overflow: ellipsis; }
+/* 16px prevents iOS Safari zooming the viewport when a field takes focus. */
+@media (max-width: 860px) { input, select, textarea { font-size: 16px; } }
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--canopy); outline-offset: 2px;
 }
@@ -224,8 +245,10 @@ tbody tr:last-child td { border-bottom: 0; }
 .mono { font-family: var(--mono); font-size: .86em; }
 .center { text-align: center; }
 .mt0 { margin-top: 0; } .mb0 { margin-bottom: 0; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
-           clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sr-only, .visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 .skip {
   position: absolute; left: .5rem; top: -3rem; z-index: 100; background: var(--canopy); color: #fff;
   padding: .6rem .9rem; border-radius: var(--r-sm); transition: top .15s;
