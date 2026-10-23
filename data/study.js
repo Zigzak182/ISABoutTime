@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — ISA Certified Arborist study content
+   Seed — ISA Certified Arborist study content
    ------------------------------------------------------------
    Original study material written for this platform. It is
    organized around the knowledge domains the ISA Certified
@@ -11,9 +11,9 @@
    not official exam weightings.
    ============================================================ */
 
-window.TTC_STUDY = {};
+window.SEED_STUDY = {};
 
-window.TTC_STUDY.domains = [
+window.SEED_STUDY.domains = [
 {
   id: "biology", name: "Tree Biology", weight: 9,
   summary: "How a tree actually works — what moves where, what grows from where, and why a tree cannot heal a wound the way an animal does.",
@@ -327,7 +327,7 @@ window.TTC_STUDY.domains = [
 ];
 
 /* ---------------- Flashcards ---------------- */
-window.TTC_STUDY.flashcards = [
+window.SEED_STUDY.flashcards = [
  ["biology","Which tissue moves water and dissolved minerals upward, and which moves manufactured sugars?","Xylem moves water and minerals upward from the roots. Phloem moves photosynthate in both directions, wherever energy is needed — including down to the root system."],
  ["biology","Where does a tree grow in length, and where does it grow in girth?","Length comes from apical meristems at the shoot and root tips (primary growth). Girth comes from the vascular cambium (secondary growth). A mark on the trunk never rises."],
  ["biology","Name the four CODIT walls in order of strength.","Wall 4, the barrier zone laid down after wounding, is strongest. Then Wall 3 (ray cells, resisting lateral spread), Wall 2 (annual ring boundary, resisting inward spread), and Wall 1 (resisting vertical spread) is weakest."],
@@ -434,7 +434,7 @@ window.TTC_STUDY.flashcards = [
 
 /* ---------------- Practice question bank ---------------- */
 /* [domain, question, [choices], correctIndex, explanation] */
-window.TTC_STUDY.quiz = [
+window.SEED_STUDY.quiz = [
 
 ["biology","Which tissue transports manufactured sugars from the leaves to the rest of the tree?",
  ["Xylem","Phloem","Heartwood","Cork cambium"],1,

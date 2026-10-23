@@ -29,7 +29,7 @@ Append a record before the closing `];` and validate:
 ```bash
 node -e "
 global.window={};require('./data/species.js');
-const s=window.TTC_SPECIES;
+const s=window.SEED_SPECIES;
 const bad=s.filter(t=>!t.id||!t.zones||!t.size||!t.soil||!t.verdict||!Array.isArray(t.regions));
 console.log('taxa:',s.length,'malformed:',bad.length);
 console.log('duplicate ids:', s.length - new Set(s.map(t=>t.id)).size);
@@ -69,10 +69,10 @@ Split it. The ranges are checked in order and must not overlap — verify after 
 ```bash
 node -e "
 global.window={};require('./data/zones.js');
-const r=window.TTC_ZONES.ranges.slice().sort((a,b)=>a[0]<b[0]?-1:1);
+const r=window.SEED_ZONES.ranges.slice().sort((a,b)=>a[0]<b[0]?-1:1);
 let n=0; for(let i=1;i<r.length;i++) if(r[i][0]<=r[i-1][1]){n++;console.log('OVERLAP',r[i-1],r[i]);}
 console.log('ranges:',r.length,'overlaps:',n);
-['02139','85018','97205','78704'].forEach(z=>console.log(z, JSON.stringify(window.TTC_ZONES.lookup(z))));
+['02139','85018','97205','78704'].forEach(z=>console.log(z, JSON.stringify(window.SEED_ZONES.lookup(z))));
 "
 ```
 
@@ -92,12 +92,12 @@ and `b` = `.5`, which is what the species comparison uses.
 
 Three exports:
 
-- `TTC_STUDY.domains` — `{ id, name, weight, summary, keyPoints[], terms[] }`.
+- `SEED_STUDY.domains` — `{ id, name, weight, summary, keyPoints[], terms[] }`.
   `weight` values must sum to 100 (they are presented as study-time guidance, **not** as
   official exam weightings).
-- `TTC_STUDY.flashcards` — authored as `[domain, question, answer]` tuples, mapped to
+- `SEED_STUDY.flashcards` — authored as `[domain, question, answer]` tuples, mapped to
   objects at the bottom of the file.
-- `TTC_STUDY.quiz` — `[domain, question, choices[4], correctIndex, explanation]`.
+- `SEED_STUDY.quiz` — `[domain, question, choices[4], correctIndex, explanation]`.
 
 ### On the quiz bank
 
@@ -114,7 +114,7 @@ Validate after editing:
 ```bash
 node -e "
 global.window={};require('./data/study.js');
-const S=window.TTC_STUDY, ids=new Set(S.domains.map(d=>d.id));
+const S=window.SEED_STUDY, ids=new Set(S.domains.map(d=>d.id));
 console.log('weights sum:', S.domains.reduce((a,d)=>a+d.weight,0));
 console.log('bad quiz:', S.quiz.filter(q=>!ids.has(q.domain)||q.choices.length!==4||!q.explain).length);
 console.log('bad cards:', S.flashcards.filter(c=>!ids.has(c.domain)||!c.a).length);

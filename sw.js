@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — service worker
+   Seed — service worker
    ------------------------------------------------------------
    GENERATED FILE. Do not edit sw.js directly — edit
    tools/sw-template.js and run `python3 tools/build.py`.
@@ -19,10 +19,14 @@
    vendor  unversioned. Leaflet from the CDN.
    ============================================================ */
 
-var VERSION = "11240bf5deaf";
-var SHELL = "ttc-shell-" + VERSION;
-var TILES = "ttc-tiles-v1";
-var VENDOR = "ttc-vendor-v1";
+var VERSION = "3dd1c8763da6";
+var SHELL = "seed-shell-" + VERSION;
+var TILES = "seed-tiles-v1";
+var VENDOR = "seed-vendor-v1";
+
+/* Caches from before the project was renamed from True Tree Care to Seed. */
+var LEGACY_TILES = "ttc-tiles-v1";
+var LEGACY_PREFIX = "ttc-";
 
 var PRECACHE = [
   "./",
@@ -37,20 +41,20 @@ var PRECACHE = [
   "./assets/img/icon-192.png",
   "./assets/img/icon-512.png",
   "./assets/img/icon-maskable-512.png",
-  "./assets/js/contact.js",
+  "./assets/js/feedback.js",
   "./assets/js/planting.js",
   "./assets/js/plot.js",
   "./assets/js/risk.js",
   "./assets/js/site.js",
   "./assets/js/study.js",
-  "./contact.html",
   "./data/species.js",
   "./data/study.js",
   "./data/zones.js",
+  "./feedback.html",
   "./index.html",
   "./manifest.webmanifest",
-  "./platform.html",
-  "./services.html",
+  "./reference.html",
+  "./tools.html",
   "./assets/vendor/leaflet/images/layers-2x.png",
   "./assets/vendor/leaflet/images/layers.png",
   "./assets/vendor/leaflet/images/marker-icon-2x.png",
@@ -110,12 +114,38 @@ self.addEventListener("install", function (event) {
 
 /* ---------- Activate ---------- */
 
+/* Copy saved map imagery across the rename. A crew that deliberately saved a
+   work area should not have to re-download it — and may be offline and unable
+   to. Runs once: afterwards the legacy cache is gone. */
+function migrateLegacyTiles() {
+  return caches.keys().then(function (names) {
+    if (names.indexOf(LEGACY_TILES) === -1 || names.indexOf(TILES) !== -1) return null;
+    return Promise.all([caches.open(LEGACY_TILES), caches.open(TILES)]).then(function (pair) {
+      var from = pair[0], to = pair[1];
+      return from.keys().then(function (reqs) {
+        /* Sequential: a few thousand entries at once would spike memory on a
+           phone, and this only ever runs on one activation. */
+        return reqs.reduce(function (chain, req) {
+          return chain.then(function () {
+            return from.match(req).then(function (res) { return res ? to.put(req, res) : null; });
+          });
+        }, Promise.resolve());
+      });
+    });
+  })["catch"](function (err) {
+    console.warn("[sw] tile migration skipped:", err && err.message);
+  });
+}
+
 self.addEventListener("activate", function (event) {
   event.waitUntil(
-    caches.keys().then(function (names) {
+    migrateLegacyTiles().then(function () {
+      return caches.keys();
+    }).then(function (names) {
       return Promise.all(names.map(function (name) {
-        /* Retire previous shell versions. Leave tiles and vendor alone. */
-        if (name.indexOf("ttc-shell-") === 0 && name !== SHELL) return caches.delete(name);
+        /* Retire previous shell versions, and everything from the old brand. */
+        if (name.indexOf(LEGACY_PREFIX) === 0) return caches.delete(name);
+        if (name.indexOf("seed-shell-") === 0 && name !== SHELL) return caches.delete(name);
         return null;
       }));
     }).then(function () {

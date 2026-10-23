@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — ISA study platform
+   Seed — ISA study platform
    ------------------------------------------------------------
    Three modes over one content set: reference reading by domain,
    flashcard drilling, and a scored practice exam.
@@ -14,8 +14,8 @@
 (function () {
   "use strict";
 
-  var E = TTC.esc;
-  var S = window.TTC_STUDY;
+  var E = SEED.esc;
+  var S = window.SEED_STUDY;
   if (!S) return;
 
   var domainName = {};
@@ -46,7 +46,7 @@
 
   /* ================= Flashcards ================= */
 
-  var fc = { deck: [], i: 0, flipped: false, known: TTC.store.get("fcKnown", {}) };
+  var fc = { deck: [], i: 0, flipped: false, known: SEED.store.get("fcKnown", {}) };
 
   function fcFilter() {
     var sel = document.getElementById("fcDomain");
@@ -56,7 +56,7 @@
 
   function fcBuild(shuffle) {
     fc.deck = fcFilter();
-    if (shuffle) fc.deck = TTC.shuffle(fc.deck);
+    if (shuffle) fc.deck = SEED.shuffle(fc.deck);
     fc.i = 0;
     fc.flipped = false;
     fcRender();
@@ -116,11 +116,11 @@
     var count = parseInt(document.getElementById("qzCount").value, 10) || 20;
 
     var pool = S.quiz.filter(function (q) { return d === "all" || q.domain === d; });
-    pool = TTC.shuffle(pool).slice(0, count);
+    pool = SEED.shuffle(pool).slice(0, count);
 
     /* Shuffle the choices too, tracking where the correct one landed. */
     qz.items = pool.map(function (q) {
-      var order = TTC.shuffle(q.choices.map(function (_, i) { return i; }));
+      var order = SEED.shuffle(q.choices.map(function (_, i) { return i; }));
       return {
         q: q.q,
         domain: q.domain,
@@ -201,14 +201,14 @@
   }
 
   function qzSave() {
-    var hist = TTC.store.get("quizHistory", []);
+    var hist = SEED.store.get("quizHistory", []);
     hist.push({
       date: new Date().toISOString().slice(0, 10),
       score: qz.score,
       total: qz.items.length,
       domain: document.getElementById("qzDomain").value
     });
-    TTC.store.set("quizHistory", hist.slice(-40));
+    SEED.store.set("quizHistory", hist.slice(-40));
     renderHistory();
   }
 
@@ -271,7 +271,7 @@
   function renderHistory() {
     var el = document.getElementById("quizHistory");
     if (!el) return;
-    var hist = TTC.store.get("quizHistory", []);
+    var hist = SEED.store.get("quizHistory", []);
     if (!hist.length) {
       el.innerHTML = '<p class="tiny muted mb0">No sessions recorded yet. Scores stay in this browser only.</p>';
       return;
@@ -304,7 +304,7 @@
   function init() {
     if (!document.getElementById("domainList")) return;
 
-    TTC.tabs("#studyTabs");
+    SEED.tabs("#studyTabs");
     fillDomainSelects();
     renderReference();
     fcBuild(false);
@@ -322,18 +322,18 @@
       if (!fc.deck.length) return;
       var k = cardKey(fc.deck[fc.i]);
       if (fc.known[k]) delete fc.known[k]; else fc.known[k] = 1;
-      TTC.store.set("fcKnown", fc.known);
+      SEED.store.set("fcKnown", fc.known);
       fcRender();
     });
     document.getElementById("fcReset").addEventListener("click", function () {
       fc.known = {};
-      TTC.store.set("fcKnown", {});
+      SEED.store.set("fcKnown", {});
       fcRender();
     });
 
     document.getElementById("qzStart").addEventListener("click", qzBuild);
     document.getElementById("qzClear").addEventListener("click", function () {
-      TTC.store.remove("quizHistory");
+      SEED.store.remove("quizHistory");
       renderHistory();
     });
 

@@ -1,13 +1,13 @@
-title: About — True Tree Care
-desc: True Tree Care is an ISA Certified Arborist practice built on structured assessment, ANSI A300 standards and ANSI Z133 safety.
+title: About Seed
+desc: What Seed is, the standards it is built on, who it is for, and the limits of what a browser tool can tell you about a tree.
 
 <section class="section" style="padding-bottom:2rem">
   <div class="wrap-narrow">
     <p class="eyebrow">About</p>
-    <h1>Credentials, standards, and how we think</h1>
+    <h1>What Seed is, and what it isn't</h1>
     <p class="lede">
-      Tree care is one of the few trades where the consequences of bad work take twenty years
-      to appear. Standards exist so that gap does not get exploited.
+      Four browser tools for arboriculture, free and open to anyone. No company behind the
+      recommendations, no account, no server, and no analytics on the tools.
     </p>
   </div>
 </section>
@@ -16,33 +16,33 @@ desc: True Tree Care is an ISA Certified Arborist practice built on structured a
   <div class="wrap">
     <div class="grid grid-2">
       <div class="card">
-        <h2 style="font-size:1.25rem">ISA Certified Arborist</h2>
+        <h2 style="font-size:1.25rem">Who it's for</h2>
         <p class="small muted">
-          Certification through the International Society of Arboriculture requires documented
-          field experience, a proctored exam across thirteen knowledge domains, and continuing
-          education units to maintain. It is the baseline credential for anyone giving advice
-          about a tree you are going to keep.
+          Working arborists who want a structured worksheet instead of a gut call.
+          Candidates studying for certification. Urban foresters managing a population
+          rather than a tree. Landscape architects specifying plantings that have to survive
+          the site. And property owners trying to make an honest decision about a tree
+          somebody just quoted them $3,000 to remove.
         </p>
-        <div class="notice" style="margin-top:1rem">
-          <strong>Before you publish:</strong> replace this block with the certifying arborist's
-          name and certification number so clients can verify it directly in ISA's public
-          "Verify a Credential" directory. An unverifiable claim is worth less than no claim.
-        </div>
+        <p class="small muted mb0">
+          None of the tools require an account, a subscription, or a tree care company.
+        </p>
       </div>
 
       <div class="card">
-        <h2 style="font-size:1.25rem">Standards we work to</h2>
+        <h2 style="font-size:1.25rem">Standards it's built on</h2>
         <dl style="font-size:.9rem">
+          <div class="term"><dt>ISA tree risk assessment framework</dt>
+            <dd>The likelihood of failure / likelihood of impact / consequences structure,
+              implemented as both published matrices.</dd></div>
           <div class="term"><dt>ANSI A300</dt>
-            <dd>The performance standard for tree care operations — pruning, support systems,
-              lightning protection, management and more. Every pruning job starts with a stated
-              objective under Part 1.</dd></div>
+            <dd>The performance standard for tree care operations — pruning types, support
+              systems, management. Referenced throughout the reference notes and study guide.</dd></div>
           <div class="term"><dt>ANSI Z133</dt>
             <dd>The safety standard for arboricultural operations: electrical clearances, drop
-              zones, PPE, two points of attachment aloft, and aerial rescue capability on site.</dd></div>
-          <div class="term"><dt>ISA Best Management Practices</dt>
-            <dd>The applied companion to the standards, covering risk assessment, pruning, soil
-              management, tree protection and integrated pest management.</dd></div>
+              zones, PPE, two points of attachment aloft, aerial rescue.</dd></div>
+          <div class="term"><dt>USDA plant hardiness zones</dt>
+            <dd>The 2023 map, approximated to ZIP prefix. See the limits below.</dd></div>
         </dl>
       </div>
     </div>
@@ -51,49 +51,71 @@ desc: True Tree Care is an ISA Certified Arborist practice built on structured a
 
 <section class="section">
   <div class="wrap-narrow">
-    <h2>Why we built the platform</h2>
+    <h2>How it works</h2>
     <p>
-      Most of what an arborist knows is not secret. It is just unevenly distributed. A homeowner
-      deciding whether to spend $3,000 on a removal has no structured way to think about it, so
-      the decision gets made on whoever sounded most confident in the driveway.
+      Seed is a static site. There is no backend, no database and no account system. The
+      species database, the ZIP-to-zone table and the study content ship as plain files that
+      load with the page, which is why the tools keep working with no connection.
     </p>
     <p>
-      The tools on this site are the same structure we use internally, opened up. The risk matrix
-      is the ISA framework. The species database carries the specific cultivar names that separate
-      a good specification from a vague one. The study guide is there because the industry needs
-      more certified arborists, not fewer.
+      Anything you save — plotted trees, study progress, quiz history — lives in your own
+      browser's storage and goes nowhere else. That is a privacy property and a data-loss
+      risk in equal measure, which is why TreePlot exports GeoJSON and CSV and why you
+      should use it at the end of every site visit.
     </p>
     <p>
-      Everything runs in your browser. There is no account, no server, and no analytics on the
-      tools. Your plotted trees and study progress live in your own browser storage and go nowhere
-      — which also means you should export anything you care about.
+      Install it to a phone home screen and it runs offline, including the map, if you save
+      the area before leaving signal.
     </p>
 
-    <div class="notice" style="margin-top:1.8rem">
-      <strong>On the study material:</strong> it is written specifically for this platform. It is
-      organized around the ISA Certified Arborist knowledge domains, but it is not ISA content, is
-      not endorsed by or affiliated with ISA, and is not a substitute for the official study guide
-      or for supervised field experience. Use it as a drill, alongside the real thing.
+    <h2 style="margin-top:2.5rem">Limits worth stating plainly</h2>
+
+    <div class="notice" style="margin-top:1rem">
+      <strong>These tools structure a judgment. They do not make one.</strong>
+      No web form can see a root plate lifting, sound a hollow stem with a mallet, read the
+      grade change a builder made fifteen years ago, or notice the conk hiding under the
+      ivy. A Level 2 basic assessment by a qualified arborist is what a rating should be
+      built on. Seed organizes what you already observed; it is not a substitute for
+      observing it.
     </div>
 
     <div class="notice" style="margin-top:1rem">
-      <strong>On the tools:</strong> the assessment and planting tools are decision support. They
-      structure a judgment; they do not make one. No web form can see a root plate lifting, hear a
-      hollow stem, or read the grade change a builder made in 2009. Have a qualified arborist look
-      at the tree.
+      <strong>ZIP code is a climate filter, not a site assessment.</strong>
+      A ZIP3 prefix covers a wide area. Elevation, urban heat island, cold-air drainage and
+      large water bodies shift the real hardiness zone by half a zone or more, and soil pH
+      cannot be predicted from a ZIP code at all. Confirm on site, and soil-test before
+      anything expensive goes in the ground.
+    </div>
+
+    <div class="notice" style="margin-top:1rem">
+      <strong>The species database is curated, not exhaustive.</strong>
+      79 taxa chosen to cover the major US regions and, deliberately, the common liability
+      trees. It is not a substitute for regional extension guidance, and it is not a legal
+      authority — always check your state's current invasive species list before specifying
+      anything.
+    </div>
+
+    <div class="notice" style="margin-top:1rem">
+      <strong>The study material is original and is not ISA content.</strong>
+      It is organized around the ISA Certified Arborist knowledge domains, but it is not
+      produced, endorsed by, or affiliated with the International Society of Arboriculture,
+      and it is not a substitute for the official study guide, the BMP series, or supervised
+      field experience. The domain percentages shown are this project's study-time guidance,
+      not exam weightings.
     </div>
   </div>
 </section>
 
 <section class="section" style="background:var(--surface-alt);border-block:1px solid var(--line)">
   <div class="wrap-narrow center">
-    <h2>Work with us</h2>
+    <h2>Found something wrong?</h2>
     <p class="lede" style="margin-inline:auto">
-      Assessments, pruning, planting plans and construction protection.
+      Species data, zone boundaries and practice notes all benefit from people who work in a
+      region correcting them.
     </p>
     <div class="row" style="justify-content:center;margin-top:1.4rem">
-      <a class="btn btn-primary" href="contact.html">Request an assessment</a>
-      <a class="btn btn-ghost" href="services.html">See services</a>
+      <a class="btn btn-primary" href="feedback.html">Report an issue</a>
+      <a class="btn btn-ghost" href="tools.html">Open the tools</a>
     </div>
   </div>
 </section>

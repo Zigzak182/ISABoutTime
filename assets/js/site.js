@@ -1,4 +1,4 @@
-/* True Tree Care — shared site behavior. Progressive enhancement only:
+/* Seed — shared site behavior. Progressive enhancement only:
    every page reads and navigates correctly with this file blocked. */
 (function () {
   "use strict";
@@ -137,7 +137,7 @@
 })();
 
 /* Small helpers shared by the platform apps. -------------------------- */
-window.TTC = {
+window.SEED = {
   /* Escape untrusted text before it goes anywhere near innerHTML. */
   esc: function (s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -147,18 +147,43 @@ window.TTC = {
 
   /* Namespaced localStorage that fails silently in private mode. */
   store: {
+    prefix: "seed:",
+
+    /* One-time migration from the project's former "ttc:" prefix. Anyone who
+       used TreePlot before the rename has a tree inventory under the old keys,
+       and silently discarding field data is not an acceptable cost of a
+       rename. Runs once, then leaves the old keys alone. */
+    migrate: function () {
+      try {
+        if (localStorage.getItem("seed:_migrated")) return;
+        var old = [], i, k;
+        for (i = 0; i < localStorage.length; i++) {
+          k = localStorage.key(i);
+          if (k && k.indexOf("ttc:") === 0) old.push(k);
+        }
+        /* Collect first, then write — adding keys mid-iteration shifts indices. */
+        old.forEach(function (key) {
+          var next = "seed:" + key.slice(4);
+          if (localStorage.getItem(next) === null) {
+            localStorage.setItem(next, localStorage.getItem(key));
+          }
+        });
+        localStorage.setItem("seed:_migrated", "1");
+      } catch (e) { /* private mode, quota, blocked storage */ }
+    },
+
     get: function (key, fallback) {
       try {
-        var raw = localStorage.getItem("ttc:" + key);
+        var raw = localStorage.getItem(this.prefix + key);
         return raw === null ? fallback : JSON.parse(raw);
       } catch (e) { return fallback; }
     },
     set: function (key, value) {
-      try { localStorage.setItem("ttc:" + key, JSON.stringify(value)); return true; }
+      try { localStorage.setItem(this.prefix + key, JSON.stringify(value)); return true; }
       catch (e) { return false; }
     },
     remove: function (key) {
-      try { localStorage.removeItem("ttc:" + key); } catch (e) {}
+      try { localStorage.removeItem(this.prefix + key); } catch (e) {}
     }
   },
 
@@ -209,3 +234,7 @@ window.TTC = {
     return { show: show };
   }
 };
+
+/* Carry pre-rename saved data forward. Runs here, after the namespace exists
+   and before any tool script is evaluated, so the first read already sees it. */
+window.SEED.store.migrate();

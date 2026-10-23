@@ -1,7 +1,7 @@
-# True Tree Care
+# Seed
 
-A tree care website plus four browser-based arboriculture tools, built around one
-question: **is this tree an asset or a liability?**
+Free, offline-capable browser tools for arborists, built around one question:
+**is this tree an asset or a liability?**
 
 Everything is static HTML, CSS and vanilla JavaScript. No build step is required to
 deploy, no server, no database, no accounts, and no data leaves the visitor's browser.
@@ -13,11 +13,11 @@ deploy, no server, no database, no accounts, and no data leaves the visitor's br
 ### The site
 | Page | Purpose |
 |---|---|
-| `index.html` | Home — the liability-vs-asset thesis and the platform |
-| `services.html` | Risk assessment, pruning, plant health care, planting, construction protection |
-| `about.html` | Credentials, standards worked to, and the honest limits of the tools |
-| `platform.html` | Hub for the four tools |
-| `contact.html` | Assessment request form |
+| `index.html` | What Seed is and the four tools |
+| `tools.html` | Hub for the four tools |
+| `reference.html` | Practice notes: risk assessment, pruning, PHC, selection, construction protection |
+| `about.html` | What Seed is and isn't, standards, and the limits of a browser tool |
+| `feedback.html` | Report an issue or contribute data |
 
 ### The platform
 
@@ -55,7 +55,7 @@ map view for offline use before you drive out to a site with no signal.
 ## Repository layout
 
 ```
-index.html  services.html  about.html  platform.html  contact.html
+index.html  tools.html  reference.html  about.html  feedback.html
 app/        risk.html  planting.html  study.html  plot.html
 sw.js       GENERATED service worker — edit tools/sw-template.js
 manifest.webmanifest
@@ -66,7 +66,7 @@ assets/js/  site.js         nav, storage, tabs, SW registration, offline badge
             planting.js     species scoring against a resolved site
             study.js        reference / flashcards / practice exam
             plot.js         GPS capture, map, inventory, offline tiles, export
-            contact.js      mailto composition
+            feedback.js     mailto composition
 assets/img/ PWA icons (generated from the brand mark)
 assets/vendor/leaflet/  Leaflet 1.9.4, vendored — no CDN at runtime
 data/       species.js      79 taxa with cultivars, tolerances, asset/liability cases
@@ -109,82 +109,19 @@ See `docs/DEPLOY.md` for GitHub Pages, Netlify and custom-domain notes, plus the
 
 ---
 
-## Before you publish
+## Before you publish your own copy
 
-The site ships with deliberate placeholders. Replace these:
+Seed has no company behind it and nothing to fill in about one. Two things are
+deployment-specific:
 
-- **Arborist name and ISA certification number** in `src/about.html`, so clients can verify
-  the credential in ISA's public directory. An unverifiable claim is worth less than none.
-- **Contact email** — `TO_ADDRESS` at the top of `assets/js/contact.js`.
-- **Service area, phone and business details** in the footer (`tools/build.py`) and
-  `src/contact.html`.
+- **Feedback destination** — `TO_ADDRESS` at the top of `assets/js/feedback.js`, or point
+  the form at an issue tracker. See `docs/DEPLOY.md`.
+- **The "Deploying your own copy?" notice** in `src/feedback.html`, if you are publishing a
+  fork rather than contributing upstream.
 
 Then run `python3 tools/build.py` and redeploy.
 
 ---
-
-## Offline and installable
-
-The site is a PWA. `sw.js` precaches the whole app — all nine pages, the CSS, the JS and
-the three data files — so every tool works with no connection at all: the ZIP planting
-guide, the risk assessment, the study guide, and TreePlot's capture, list and export.
-
-**`sw.js` is generated, and its version is a SHA-256 over the bytes of everything it
-precaches.** Any content change produces a new version and retires the old cache
-automatically. Hand-maintained cache versions drift, and a stale service worker is the
-worst failure mode an offline app has.
-
-Three caches, deliberately separated:
-
-| Cache | Lifetime | Contents |
-|---|---|---|
-| `ttc-shell-<hash>` | Retired on every deploy | Pages, CSS, JS, data, icons |
-| `ttc-tiles-v1` | Survives deploys | Map imagery, capped at 3000 tiles (~45 MB), trimmed FIFO |
-| `ttc-vendor-v1` | Survives deploys | Leaflet, when loaded from the CDN |
-
-Tiles survive deploys on purpose: a crew that cached a work area should not lose it
-because someone shipped a copy edit.
-
-Strategies are matched to the content. Navigations are network-first with a 3.5 s deadline
-(a field connection that is *present but useless* is worse than none — without a deadline
-every navigation hangs until TCP gives up) falling back to cache, then to the home page.
-Static assets are cache-first with background revalidation. Tiles are cache-first, and a
-missing tile offline returns a transparent 1×1 so Leaflet's grid stays intact instead of
-filling with broken-image icons.
-
-### Saving map areas
-
-TreePlot's **Save map area offline** button caches the current view plus two zoom levels in,
-so the map still draws with no signal. It is capped at 1200 tiles per request, because the
-OpenStreetMap Foundation's tile servers are donated infrastructure and bulk downloading is
-against their usage policy — zoom in and save a couple of smaller areas instead.
-
-### Leaflet is vendored, not CDN-loaded
-
-Loading the map library from a CDN would be a real weakness for an offline tool: a crew that
-installs the app at the office and drives somewhere with no signal would depend on that
-library having happened to be cached. So Leaflet 1.9.4 lives in `assets/vendor/leaflet/`
-and is precached with the rest of the shell.
-
-**Map tiles are the only cross-origin request the site makes.**
-
-`tools/vendor-leaflet.sh` is what put it there. It pulls from the npm registry — the
-authoritative publication that the CDNs mirror — and verifies the tarball against a pinned
-SHA-512 before extracting anything. Re-run it to upgrade:
-
-```bash
-tools/vendor-leaflet.sh    # verify + extract into assets/vendor/
-python3 tools/build.py     # refresh the precache list and version
-```
-
-To move to a new Leaflet version, change `VERSION` in the script, set `EXPECTED_SHA512=""`,
-run it once to print the hash, verify that hash against the registry, then paste it in.
-
-### Updating
-
-When a new version is deployed, the next visit shows a "A new version is ready — Reload"
-prompt rather than swapping content underneath someone mid-assessment. Nothing reloads
-unless the user asks.
 
 ## Accuracy and scope
 
@@ -214,7 +151,8 @@ need it. The service worker requires HTTPS (or `localhost`); without it everythi
 works, just without offline support. TreePlot degrades to a usable non-map mode when the
 map library or tiles are unavailable.
 
-Study progress and plotted trees are stored in `localStorage` under the `ttc:` prefix. That
+Study progress and plotted trees are stored in `localStorage` under the `seed:` prefix (data
+saved under the project's former `ttc:` prefix is migrated across automatically, once). That
 data stays on the device, is never transmitted, and **is lost if site data is cleared** —
 which is why TreePlot exports GeoJSON and CSV. There is no analytics on the tools.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-True Tree Care — static page assembler.
+Seed — static page assembler.
 
 Every page is plain HTML with no runtime dependencies, but the shared
 header, footer and <head> block would otherwise be copy-pasted nine
@@ -24,10 +24,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 
 BRAND_MARK = '''<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-  <path d="M24 4c-6 0-10 4.4-10 9.6 0 1.2.2 2.3.6 3.3C11 18.2 9 21.2 9 24.7 9 29.3 12.8 33 17.6 33H22v5.5c0 .6-.4 1.1-1 1.3l-4 1.2c-.6.2-1 .7-1 1.3 0 .4.3.7.7.7h14.6c.4 0 .7-.3.7-.7 0-.6-.4-1.1-1-1.3l-4-1.2c-.6-.2-1-.7-1-1.3V33h4.4C35.2 33 39 29.3 39 24.7c0-3.5-2-6.5-5.6-7.8.4-1 .6-2.1.6-3.3C34 8.4 30 4 24 4z"
-        fill="currentColor" opacity=".9"/>
-  <path d="M24 42V20m0 6 5-5m-5 11-6-6" stroke="var(--bg)" stroke-width="2.1"
-        stroke-linecap="round" fill="none"/>
+  <path d="M24 44V21" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+  <path d="M23.2 32.5c-1.2-7.2-6.6-11.2-14.2-10.6.4 7.2 6 11.8 14.2 10.6z"
+        fill="currentColor" opacity=".78"/>
+  <path d="M24.8 26.5c1.3-8.3 7.4-12.8 15.6-12.1-.4 8.3-6.4 13.4-15.6 12.1z"
+        fill="currentColor"/>
 </svg>'''
 
 # TreePlot's only third-party dependency. If someone has run
@@ -49,10 +50,10 @@ def leaflet_sources():
 
 NAV_ITEMS = [
     ("index.html",     "Home"),
-    ("services.html",  "Services"),
+    ("tools.html",     "Tools"),
+    ("reference.html", "Reference"),
     ("about.html",     "About"),
-    ("platform.html",  "Platform"),
-    ("contact.html",   "Contact"),
+    ("feedback.html",  "Feedback"),
 ]
 
 SHELL = '''<!DOCTYPE html>
@@ -66,11 +67,11 @@ SHELL = '''<!DOCTYPE html>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%B3%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="{base}assets/img/apple-touch-icon.png">
 <link rel="manifest" href="{base}manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="True Tree Care">
+<meta name="apple-mobile-web-app-title" content="Seed">
 <link rel="stylesheet" href="{base}assets/css/main.css">
 {extra_css}</head>
 <body>
@@ -80,7 +81,7 @@ SHELL = '''<!DOCTYPE html>
   <div class="wrap">
     <a class="brand" href="{base}index.html">
       {mark}
-      <span>True Tree Care<small>ISA Certified Arborist</small></span>
+      <span>Seed<small>Arboriculture toolkit</small></span>
     </a>
     <button class="nav-toggle" aria-expanded="false" aria-controls="sitenav">Menu</button>
     <nav class="nav" id="sitenav" aria-label="Main">
@@ -97,24 +98,14 @@ SHELL = '''<!DOCTYPE html>
   <div class="wrap">
     <div class="grid grid-4">
       <div>
-        <strong style="font-size:1.05rem">True Tree Care</strong>
+        <strong style="font-size:1.05rem">Seed</strong>
         <p class="small" style="color:#b0a898;margin-top:.5rem">
-          Arboriculture built on evidence, not guesswork. Every recommendation
-          traces back to species, site and structure.
+          Free, open tools for arborists. Everything runs in your browser —
+          no account, no server, and nothing leaves the device.
         </p>
       </div>
       <div>
-        <h4>Services</h4>
-        <ul>
-          <li><a href="{base}services.html#assessment">Risk Assessment</a></li>
-          <li><a href="{base}services.html#pruning">Pruning &amp; Structure</a></li>
-          <li><a href="{base}services.html#health">Plant Health Care</a></li>
-          <li><a href="{base}services.html#planting">Planting &amp; Selection</a></li>
-          <li><a href="{base}services.html#construction">Construction Protection</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Platform</h4>
+        <h4>Tools</h4>
         <ul>
           <li><a href="{base}app/risk.html">Liability vs. Asset</a></li>
           <li><a href="{base}app/planting.html">Planting Guide by ZIP</a></li>
@@ -123,20 +114,27 @@ SHELL = '''<!DOCTYPE html>
         </ul>
       </div>
       <div>
-        <h4>Contact</h4>
+        <h4>Reference</h4>
         <ul>
-          <li><a href="{base}contact.html">Request an assessment</a></li>
-          <li><a href="{base}about.html">Credentials</a></li>
+          <li><a href="{base}reference.html#assessment">Risk Assessment</a></li>
+          <li><a href="{base}reference.html#pruning">Pruning &amp; Structure</a></li>
+          <li><a href="{base}reference.html#health">Plant Health Care</a></li>
+          <li><a href="{base}reference.html#planting">Species Selection</a></li>
+          <li><a href="{base}reference.html#construction">Construction Protection</a></li>
         </ul>
-        <p class="small" style="color:#b0a898;margin-top:.8rem">
-          Set your service area, phone and email in
-          <span class="mono">src/</span> before publishing.
-        </p>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="{base}about.html">About Seed</a></li>
+          <li><a href="{base}feedback.html">Report an issue</a></li>
+          <li><a href="{base}feedback.html#contribute">Contribute data</a></li>
+        </ul>
       </div>
     </div>
     <div class="foot-legal">
-      <span>&copy; <span data-year>2026</span> True Tree Care.</span>
-      <span>ISA Certified Arborist on staff.</span>
+      <span>&copy; <span data-year>2026</span> Seed.</span>
+      <span>Decision support for qualified arborists — not a substitute for one.</span>
       <span>Study material is original and is not ISA-endorsed.</span>
     </div>
   </div>
@@ -173,11 +171,11 @@ def parse_fragment(path):
 # Files the service worker precaches. Order is irrelevant; the hash is taken
 # over the sorted list so the version is stable across machines.
 PRECACHE_GLOBS = [
-    "index.html", "services.html", "about.html", "platform.html", "contact.html",
+    "index.html", "tools.html", "reference.html", "about.html", "feedback.html",
     "app/risk.html", "app/planting.html", "app/study.html", "app/plot.html",
     "assets/css/main.css", "assets/css/app.css",
     "assets/js/site.js", "assets/js/risk.js", "assets/js/planting.js",
-    "assets/js/study.js", "assets/js/plot.js", "assets/js/contact.js",
+    "assets/js/study.js", "assets/js/plot.js", "assets/js/feedback.js",
     "data/species.js", "data/zones.js", "data/study.js",
     "assets/img/icon-192.png", "assets/img/icon-512.png",
     "assets/img/icon-maskable-512.png", "assets/img/apple-touch-icon.png",
@@ -283,7 +281,7 @@ def main():
 
         html = SHELL.format(
             slug=os.path.splitext(os.path.basename(out_rel))[0],
-            title=meta.get("title", "True Tree Care"),
+            title=meta.get("title", "Seed"),
             desc=meta.get("desc", ""),
             base=base,
             mark=BRAND_MARK,

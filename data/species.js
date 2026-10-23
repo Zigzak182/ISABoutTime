@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — Tree & Cultivar Database
+   Seed — Tree & Cultivar Database
    ------------------------------------------------------------
    Loaded as a plain global (no fetch) so every tool in this
    platform works from file://, GitHub Pages, or any static host.
@@ -37,7 +37,7 @@
    pnw Pacific Northwest  ca  California
    ============================================================ */
 
-window.TTC_SPECIES = [
+window.SEED_SPECIES = [
 
 /* ---------------- OAKS — the backbone of the asset column ---------------- */
 {

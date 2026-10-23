@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-page="feedback" data-base="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feedback &amp; Contributing — Seed</title>
+<meta name="description" content="Report a bug, correct a species record or hardiness zone, or contribute data to Seed.">
+<meta name="theme-color" content="#1e5631">
+<meta property="og:title" content="Feedback &amp; Contributing — Seed">
+<meta property="og:description" content="Report a bug, correct a species record or hardiness zone, or contribute data to Seed.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Seed">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+  <path d="M24 44V21" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+  <path d="M23.2 32.5c-1.2-7.2-6.6-11.2-14.2-10.6.4 7.2 6 11.8 14.2 10.6z"
+        fill="currentColor" opacity=".78"/>
+  <path d="M24.8 26.5c1.3-8.3 7.4-12.8 15.6-12.1-.4 8.3-6.4 13.4-15.6 12.1z"
+        fill="currentColor"/>
+</svg>
+      <span>Seed<small>Arboriculture toolkit</small></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="sitenav">Menu</button>
+    <nav class="nav" id="sitenav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="reference.html">Reference</a>
+      <a href="about.html">About</a>
+      <a href="feedback.html" aria-current="page">Feedback</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<section class="section" style="padding-bottom:1.5rem">
+  <div class="wrap-narrow">
+    <p class="eyebrow">Feedback</p>
+    <h1>Report an issue or contribute data</h1>
+    <p class="lede">
+      The species database and the ZIP-to-zone table are the parts most likely to be wrong
+      in any given region, and the people best placed to correct them are the ones working
+      there.
+    </p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="split">
+      <aside class="card sticky-side">
+        <h2 style="font-size:1.1rem">What's most useful</h2>
+        <ul class="small muted" style="padding-left:1.1rem">
+          <li><strong>A species that's wrong for your region.</strong> Something listed as an
+            asset that fails locally, or a liability call you'd argue with.</li>
+          <li><strong>A missing cultivar.</strong> Especially named selections that solve a
+            real problem — fruitless, male, narrow, disease-resistant.</li>
+          <li><strong>A hardiness zone that's off.</strong> ZIP prefixes cover a lot of ground;
+            mountain and coastal areas are the usual offenders.</li>
+          <li><strong>A species missing entirely</strong> for a region the database covers
+            thinly.</li>
+          <li><strong>A bug</strong> — anything that miscalculates, fails to save, or breaks
+            on your device.</li>
+        </ul>
+        <p class="small muted">
+          Regional specifics beat general corrections. "Red maple is chlorotic on the
+          limestone fill across most of this county" is actionable; "red maple is overrated"
+          is not.
+        </p>
+      </aside>
+
+      <div>
+        <form id="feedbackForm" class="card">
+          <div class="field">
+            <label for="fKind">What are you reporting?</label>
+            <select id="fKind" name="kind">
+              <option value="Species correction">A species record is wrong for my region</option>
+              <option value="Missing species or cultivar">A species or cultivar is missing</option>
+              <option value="Hardiness zone correction">A ZIP code resolves to the wrong zone</option>
+              <option value="Study content correction">Something in the study guide is wrong</option>
+              <option value="Bug report">Something is broken</option>
+              <option value="General feedback">General feedback</option>
+            </select>
+          </div>
+
+          <div class="grid grid-2" style="gap:0 1rem">
+            <div class="field">
+              <label for="fRegion">Your region or ZIP code</label>
+              <input id="fRegion" name="region" placeholder="e.g. 27601, or Front Range CO">
+            </div>
+            <div class="field">
+              <label for="fSubject">Species, ZIP or page affected</label>
+              <input id="fSubject" name="subject" placeholder="e.g. Acer rubrum, or app/planting.html">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fDetail">What's wrong, and what should it say?</label>
+            <textarea id="fDetail" name="detail" rows="6" required
+              placeholder="Shumard oak is listed for the Great Plains, but on the high-pH caliche soils west of here it goes chlorotic within five years. Chinkapin oak handles those soils far better and should be the recommendation above pH 7.8."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="fSource">Supporting source <span class="muted" style="font-weight:400">(optional)</span></label>
+            <input id="fSource" name="source"
+                   placeholder="Extension publication, regional BMP, your own field observation over N years">
+            <p class="hint">Field observation counts — just say so, and roughly how long.</p>
+          </div>
+
+          <div class="field">
+            <label for="fCredential">Your background <span class="muted" style="font-weight:400">(optional)</span></label>
+            <input id="fCredential" name="credential"
+                   placeholder="ISA Certified Arborist, municipal forester, extension agent, homeowner…">
+            <p class="hint">Only used to weigh the correction. Nothing is published.</p>
+          </div>
+
+          <div class="row">
+            <button type="submit" class="btn btn-primary">Compose the report</button>
+            <button type="button" class="btn btn-ghost" id="copyBtn">Copy as text</button>
+          </div>
+          <p class="hint" id="feedbackHint">
+            Nothing is transmitted from this page. The button opens your email client, or
+            copies the report so you can paste it into a GitHub issue.
+          </p>
+        </form>
+
+        <div class="card" style="margin-top:1.2rem" id="previewCard" hidden>
+          <h3 style="font-size:1rem">Report preview</h3>
+          <pre class="mono small" id="preview" style="white-space:pre-wrap;margin:0;color:var(--ink-soft)"></pre>
+        </div>
+
+        <div class="card" style="margin-top:1.2rem" id="contribute">
+          <h2 style="font-size:1.15rem">Contributing directly</h2>
+          <p class="small muted">
+            Seed is a static site with no build step and no dependencies. The data that drives
+            the tools is three plain files you can edit and open in a browser:
+          </p>
+          <dl style="font-size:.88rem">
+            <div class="term"><dt><span class="mono">data/species.js</span></dt>
+              <dd>79 taxa with cultivars, tolerances, and an asset and liability case for each.
+                Every record carries a liability entry — a tree with none is a record nobody
+                thought hard enough about.</dd></div>
+            <div class="term"><dt><span class="mono">data/zones.js</span></dt>
+              <dd>186 ZIP-prefix ranges mapped to hardiness zone, planting region and moisture
+                regime. Splitting a range is the usual fix.</dd></div>
+            <div class="term"><dt><span class="mono">data/study.js</span></dt>
+              <dd>13 domains, 90 flashcards, 79 practice questions. Every question needs a real
+                explanation — a bank that only says "wrong" teaches recognition, not material.</dd></div>
+          </dl>
+          <p class="small muted mb0">
+            <span class="mono">docs/DATA.md</span> documents each schema and includes validation
+            commands to run after editing.
+          </p>
+        </div>
+
+        <div class="notice" style="margin-top:1.2rem">
+          <strong>Deploying your own copy?</strong> This form composes a
+          <span class="mono">mailto:</span> message because the site is static and has no
+          server. Set the destination in <span class="mono">assets/js/feedback.js</span>, or
+          point it at an issue tracker. See <span class="mono">docs/DEPLOY.md</span>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="grid grid-4">
+      <div>
+        <strong style="font-size:1.05rem">Seed</strong>
+        <p class="small" style="color:#b0a898;margin-top:.5rem">
+          Free, open tools for arborists. Everything runs in your browser —
+          no account, no server, and nothing leaves the device.
+        </p>
+      </div>
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="app/risk.html">Liability vs. Asset</a></li>
+          <li><a href="app/planting.html">Planting Guide by ZIP</a></li>
+          <li><a href="app/study.html">ISA Study Guide</a></li>
+          <li><a href="app/plot.html">TreePlot GPS</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Reference</h4>
+        <ul>
+          <li><a href="reference.html#assessment">Risk Assessment</a></li>
+          <li><a href="reference.html#pruning">Pruning &amp; Structure</a></li>
+          <li><a href="reference.html#health">Plant Health Care</a></li>
+          <li><a href="reference.html#planting">Species Selection</a></li>
+          <li><a href="reference.html#construction">Construction Protection</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="about.html">About Seed</a></li>
+          <li><a href="feedback.html">Report an issue</a></li>
+          <li><a href="feedback.html#contribute">Contribute data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>&copy; <span data-year>2026</span> Seed.</span>
+      <span>Decision support for qualified arborists — not a substitute for one.</span>
+      <span>Study material is original and is not ISA-endorsed.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+<script src="assets/js/feedback.js"></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+title: Feedback &amp; Contributing — Seed
+desc: Report a bug, correct a species record or hardiness zone, or contribute data to Seed.
+out: feedback.html
+js: assets/js/feedback.js
+
+<section class="section" style="padding-bottom:1.5rem">
+  <div class="wrap-narrow">
+    <p class="eyebrow">Feedback</p>
+    <h1>Report an issue or contribute data</h1>
+    <p class="lede">
+      The species database and the ZIP-to-zone table are the parts most likely to be wrong
+      in any given region, and the people best placed to correct them are the ones working
+      there.
+    </p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="split">
+      <aside class="card sticky-side">
+        <h2 style="font-size:1.1rem">What's most useful</h2>
+        <ul class="small muted" style="padding-left:1.1rem">
+          <li><strong>A species that's wrong for your region.</strong> Something listed as an
+            asset that fails locally, or a liability call you'd argue with.</li>
+          <li><strong>A missing cultivar.</strong> Especially named selections that solve a
+            real problem — fruitless, male, narrow, disease-resistant.</li>
+          <li><strong>A hardiness zone that's off.</strong> ZIP prefixes cover a lot of ground;
+            mountain and coastal areas are the usual offenders.</li>
+          <li><strong>A species missing entirely</strong> for a region the database covers
+            thinly.</li>
+          <li><strong>A bug</strong> — anything that miscalculates, fails to save, or breaks
+            on your device.</li>
+        </ul>
+        <p class="small muted">
+          Regional specifics beat general corrections. "Red maple is chlorotic on the
+          limestone fill across most of this county" is actionable; "red maple is overrated"
+          is not.
+        </p>
+      </aside>
+
+      <div>
+        <form id="feedbackForm" class="card">
+          <div class="field">
+            <label for="fKind">What are you reporting?</label>
+            <select id="fKind" name="kind">
+              <option value="Species correction">A species record is wrong for my region</option>
+              <option value="Missing species or cultivar">A species or cultivar is missing</option>
+              <option value="Hardiness zone correction">A ZIP code resolves to the wrong zone</option>
+              <option value="Study content correction">Something in the study guide is wrong</option>
+              <option value="Bug report">Something is broken</option>
+              <option value="General feedback">General feedback</option>
+            </select>
+          </div>
+
+          <div class="grid grid-2" style="gap:0 1rem">
+            <div class="field">
+              <label for="fRegion">Your region or ZIP code</label>
+              <input id="fRegion" name="region" placeholder="e.g. 27601, or Front Range CO">
+            </div>
+            <div class="field">
+              <label for="fSubject">Species, ZIP or page affected</label>
+              <input id="fSubject" name="subject" placeholder="e.g. Acer rubrum, or app/planting.html">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fDetail">What's wrong, and what should it say?</label>
+            <textarea id="fDetail" name="detail" rows="6" required
+              placeholder="Shumard oak is listed for the Great Plains, but on the high-pH caliche soils west of here it goes chlorotic within five years. Chinkapin oak handles those soils far better and should be the recommendation above pH 7.8."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="fSource">Supporting source <span class="muted" style="font-weight:400">(optional)</span></label>
+            <input id="fSource" name="source"
+                   placeholder="Extension publication, regional BMP, your own field observation over N years">
+            <p class="hint">Field observation counts — just say so, and roughly how long.</p>
+          </div>
+
+          <div class="field">
+            <label for="fCredential">Your background <span class="muted" style="font-weight:400">(optional)</span></label>
+            <input id="fCredential" name="credential"
+                   placeholder="ISA Certified Arborist, municipal forester, extension agent, homeowner…">
+            <p class="hint">Only used to weigh the correction. Nothing is published.</p>
+          </div>
+
+          <div class="row">
+            <button type="submit" class="btn btn-primary">Compose the report</button>
+            <button type="button" class="btn btn-ghost" id="copyBtn">Copy as text</button>
+          </div>
+          <p class="hint" id="feedbackHint">
+            Nothing is transmitted from this page. The button opens your email client, or
+            copies the report so you can paste it into a GitHub issue.
+          </p>
+        </form>
+
+        <div class="card" style="margin-top:1.2rem" id="previewCard" hidden>
+          <h3 style="font-size:1rem">Report preview</h3>
+          <pre class="mono small" id="preview" style="white-space:pre-wrap;margin:0;color:var(--ink-soft)"></pre>
+        </div>
+
+        <div class="card" style="margin-top:1.2rem" id="contribute">
+          <h2 style="font-size:1.15rem">Contributing directly</h2>
+          <p class="small muted">
+            Seed is a static site with no build step and no dependencies. The data that drives
+            the tools is three plain files you can edit and open in a browser:
+          </p>
+          <dl style="font-size:.88rem">
+            <div class="term"><dt><span class="mono">data/species.js</span></dt>
+              <dd>79 taxa with cultivars, tolerances, and an asset and liability case for each.
+                Every record carries a liability entry — a tree with none is a record nobody
+                thought hard enough about.</dd></div>
+            <div class="term"><dt><span class="mono">data/zones.js</span></dt>
+              <dd>186 ZIP-prefix ranges mapped to hardiness zone, planting region and moisture
+                regime. Splitting a range is the usual fix.</dd></div>
+            <div class="term"><dt><span class="mono">data/study.js</span></dt>
+              <dd>13 domains, 90 flashcards, 79 practice questions. Every question needs a real
+                explanation — a bank that only says "wrong" teaches recognition, not material.</dd></div>
+          </dl>
+          <p class="small muted mb0">
+            <span class="mono">docs/DATA.md</span> documents each schema and includes validation
+            commands to run after editing.
+          </p>
+        </div>
+
+        <div class="notice" style="margin-top:1.2rem">
+          <strong>Deploying your own copy?</strong> This form composes a
+          <span class="mono">mailto:</span> message because the site is static and has no
+          server. Set the destination in <span class="mono">assets/js/feedback.js</span>, or
+          point it at an issue tracker. See <span class="mono">docs/DEPLOY.md</span>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

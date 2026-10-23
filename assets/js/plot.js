@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — TreePlot GPS
+   Seed — TreePlot GPS
    ------------------------------------------------------------
    Field inventory tool. Captures a tree's position from the
    device GPS (or a map tap), records the attributes an arborist
@@ -12,11 +12,11 @@
 (function () {
   "use strict";
 
-  var E = TTC.esc;
+  var E = SEED.esc;
   var STORE = "plotTrees";
 
   var map = null, layer = null, meMarker = null, meCircle = null, didFit = false;
-  var trees = TTC.store.get(STORE, []);
+  var trees = SEED.store.get(STORE, []);
   var watchId = null;
   var lastFix = null;
   var pendingLatLng = null;
@@ -29,7 +29,7 @@
   /* ---------- Persistence ---------- */
 
   function save() {
-    if (!TTC.store.set(STORE, trees)) {
+    if (!SEED.store.set(STORE, trees)) {
       flash("Could not save — browser storage is full or blocked. Export your data now.", true);
     }
   }
@@ -523,13 +523,13 @@
 
     document.getElementById("exportGeo").addEventListener("click", function () {
       if (!trees.length) { flash("Nothing to export yet.", true); return; }
-      TTC.download("treeplot-" + new Date().toISOString().slice(0, 10) + ".geojson",
+      SEED.download("treeplot-" + new Date().toISOString().slice(0, 10) + ".geojson",
                    toGeoJSON(), "application/geo+json");
     });
 
     document.getElementById("exportCsv").addEventListener("click", function () {
       if (!trees.length) { flash("Nothing to export yet.", true); return; }
-      TTC.download("treeplot-" + new Date().toISOString().slice(0, 10) + ".csv",
+      SEED.download("treeplot-" + new Date().toISOString().slice(0, 10) + ".csv",
                    toCSV(), "text/csv;charset=utf-8");
     });
 
@@ -549,8 +549,8 @@
 
     /* Species datalist from the platform database. */
     var dl = document.getElementById("speciesList");
-    if (dl && window.TTC_SPECIES) {
-      window.TTC_SPECIES.forEach(function (s) {
+    if (dl && window.SEED_SPECIES) {
+      window.SEED_SPECIES.forEach(function (s) {
         var o = document.createElement("option");
         o.value = s.common;
         o.label = s.sci;

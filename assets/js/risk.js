@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — Liability vs. Asset assessment
+   Seed — Liability vs. Asset assessment
    ------------------------------------------------------------
    Two analyses, one verdict.
 
@@ -18,7 +18,7 @@
 (function () {
   "use strict";
 
-  var E = TTC.esc;
+  var E = SEED.esc;
 
   /* ---------- ISA-style risk matrices ---------- */
 
@@ -138,7 +138,7 @@
     var species = val("species");
     var sp = null;
     if (species) {
-      sp = (window.TTC_SPECIES || []).filter(function (s) { return s.id === species; })[0] || null;
+      sp = (window.SEED_SPECIES || []).filter(function (s) { return s.id === species; })[0] || null;
     }
     if (sp) {
       if (sp.verdict === "asset") add("Species is a proven long-term performer — " + sp.common, 12);
@@ -377,8 +377,8 @@
 
   function populateSpecies() {
     var sel = document.getElementById("species");
-    if (!sel || !window.TTC_SPECIES) return;
-    var sorted = window.TTC_SPECIES.slice().sort(function (a, b) {
+    if (!sel || !window.SEED_SPECIES) return;
+    var sorted = window.SEED_SPECIES.slice().sort(function (a, b) {
       return a.common.localeCompare(b.common);
     });
     sorted.forEach(function (s) {

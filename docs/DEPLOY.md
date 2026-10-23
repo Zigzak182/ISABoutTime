@@ -1,4 +1,4 @@
-# Deploying True Tree Care
+# Deploying Seed
 
 The site is static. Any host that serves files will do.
 
@@ -6,19 +6,15 @@ The site is static. Any host that serves files will do.
 
 ## Pre-launch checklist
 
-Do these first. Everything here is a placeholder shipped on purpose.
+Seed has no company details to fill in. Only two things are deployment-specific:
 
-- [ ] **`src/about.html`** — replace the "Before you publish" notice with the certifying
-      arborist's name and ISA certification number. Clients can then verify it in ISA's
-      public credential directory. An unverifiable claim is worth less than no claim.
-- [ ] **`assets/js/contact.js`** — set `TO_ADDRESS` to the real inbox.
-- [ ] **`tools/build.py`** — footer: service area, phone, and remove the
-      "Set your service area…" note.
-- [ ] **`src/contact.html`** — replace the "Deploying this site?" notice block, and put a
-      real phone number in the emergency callout.
-- [ ] Run `python3 tools/build.py` and commit the regenerated pages.
-- [ ] Confirm the site is served over **HTTPS** — TreePlot's geolocation will not run
-      without it.
+- [ ] **`assets/js/feedback.js`** — set `TO_ADDRESS` to the inbox that should receive
+      reports, or replace the submit handler with a POST to an issue tracker.
+- [ ] **`src/feedback.html`** — replace the "Deploying your own copy?" notice if you are
+      publishing a fork.
+- [ ] Run `python3 tools/build.py` and commit the regenerated pages **and `sw.js`**.
+- [ ] Confirm the site is served over **HTTPS** — the service worker and TreePlot's
+      geolocation both refuse to run without it.
 
 ---
 
@@ -92,7 +88,7 @@ fine for low volume, but it depends on the visitor having a mail client configur
 loses anyone who doesn't.
 
 To receive submissions properly, pick a form service and swap the submit handler in
-`assets/js/contact.js`:
+`assets/js/feedback.js`:
 
 ```js
 form.addEventListener("submit", async function (e) {
@@ -109,8 +105,8 @@ form.addEventListener("submit", async function (e) {
 
 Every input already carries a `name` attribute, so `FormData` picks them all up.
 
-Netlify Forms is even simpler: add `netlify` and `name="contact"` to the `<form>` tag in
-`src/contact.html` and delete the JS handler.
+Netlify Forms is even simpler: add `netlify` and `name="feedback"` to the `<form>` tag in
+`src/feedback.html` and delete the JS handler.
 
 ---
 

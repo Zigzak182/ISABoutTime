@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — design system
+   Seed — design system
    One stylesheet for the marketing site and the platform apps.
    ============================================================ */
 
@@ -260,6 +260,36 @@ tbody tr:last-child td { border-bottom: 0; }
   padding: .9rem 1.1rem; border-radius: 0 var(--r) var(--r) 0; font-size: .9rem;
 }
 .notice strong { color: var(--ink); }
+
+
+/* ---------- Shared layout primitives ----------
+   These live here rather than in app.css because the content pages use
+   them too, and those pages do not load the tool stylesheet. */
+/* ---------- Split layout: controls + results ---------- */
+.split { display: grid; gap: 1.5rem; align-items: start; grid-template-columns: minmax(280px, 340px) 1fr; }
+/* Main content first, aside second — used by TreePlot so the map leads.
+   This must be a class, not an inline style: an inline grid-template-columns
+   outranks the media query below and strands the layout in two columns on a
+   phone, which squashes the map to a sliver. */
+.split-main-first { grid-template-columns: 1fr minmax(280px, 340px); }
+.sticky-side { position: sticky; top: 82px; }
+
+@media (max-width: 860px) {
+  .split, .split-main-first { grid-template-columns: 1fr; gap: 1.1rem; }
+  .sticky-side { position: static; }
+}
+
+.ledger { display: grid; gap: .5rem; }
+.ledger-row { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: baseline;
+              padding: .45rem .1rem; border-bottom: 1px dashed var(--line); font-size: .88rem; }
+.ledger-row:last-child { border-bottom: 0; }
+.ledger-val { font-family: var(--mono); font-weight: 650; white-space: nowrap; }
+.val-pos { color: var(--risk-low); } .val-neg { color: var(--risk-extreme); }
+
+.term { border-bottom: 1px dotted var(--line-strong); padding: .7rem 0; }
+.term:last-child { border-bottom: 0; }
+.term dt { font-weight: 650; margin-bottom: .15rem; }
+.term dd { margin: 0; color: var(--ink-soft); font-size: .92rem; }
 
 /* ---------- Toasts and connectivity ---------- */
 .toast {

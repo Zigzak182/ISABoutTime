@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — ZIP prefix → planting region lookup
+   Seed — ZIP prefix → planting region lookup
    ------------------------------------------------------------
    Resolves a US ZIP code to an approximate USDA plant hardiness
    zone, a planting region, and a moisture regime, using the
@@ -20,7 +20,7 @@
      city   representative locality, shown back to the user
    ============================================================ */
 
-window.TTC_ZONES = {
+window.SEED_ZONES = {
 
   regions: {
     ne:   { name: "Northeast",          note: "Cold winters, reliable summer rain, heavy road salt. Salt tolerance and cold hardiness drive the list." },

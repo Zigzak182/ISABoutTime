@@ -1,14 +1,14 @@
-/* True Tree Care — contact form.
+/* Seed — feedback form.
    The site is static, so the form composes a mailto: message rather than
    posting anywhere. Set TO_ADDRESS before publishing, or replace the submit
-   handler with a POST to whatever form service you prefer. */
+   handler with a POST to an issue tracker or form service. */
 (function () {
   "use strict";
 
   /* ---- Set this before publishing. ---- */
-  var TO_ADDRESS = "office@example.com";
+  var TO_ADDRESS = "maintainer@example.com";
 
-  var form = document.getElementById("contactForm");
+  var form = document.getElementById("feedbackForm");
   if (!form) return;
 
   function v(id) {
@@ -17,28 +17,21 @@
   }
 
   function compose() {
-    var lines = [
-      "Service requested: " + v("cService"),
-      "Urgency: " + v("cUrgency"),
+    return [
+      "Report type: " + v("fKind"),
+      "Region / ZIP: " + (v("fRegion") || "not given"),
+      "Subject: " + (v("fSubject") || "not given"),
+      "Reporter background: " + (v("fCredential") || "not given"),
       "",
-      "Name: " + v("cName"),
-      "Email: " + v("cEmail"),
-      "Phone: " + (v("cPhone") || "not given"),
-      "Property ZIP: " + v("cZip"),
+      "Detail:",
+      v("fDetail") || "(nothing written)",
       "",
-      "Number of trees: " + v("cCount"),
-      "Approx. trunk diameter: " + (v("cDbh") ? v("cDbh") + " in at 4.5 ft" : "not measured"),
-      "Target beneath/beside: " + (v("cTarget") || "not described"),
-      "",
-      "What they are seeing:",
-      v("cNotes") || "(nothing written)"
-    ];
-    return lines.join("\n");
+      "Source: " + (v("fSource") || "none cited")
+    ].join("\n");
   }
 
   function subject() {
-    return "Assessment request — " + v("cService") + " — " + (v("cName") || "no name") +
-           " (" + (v("cZip") || "no ZIP") + ")";
+    return "Seed — " + v("fKind") + (v("fSubject") ? ": " + v("fSubject") : "");
   }
 
   function showPreview(body) {
@@ -58,10 +51,10 @@
   document.getElementById("copyBtn").addEventListener("click", function () {
     var body = subject() + "\n\n" + compose();
     showPreview(body);
-    var hint = document.getElementById("contactHint");
+    var hint = document.getElementById("feedbackHint");
     function done(ok) {
       hint.textContent = ok
-        ? "Copied. Paste it into an email to " + TO_ADDRESS + "."
+        ? "Copied. Paste it into an email or a GitHub issue."
         : "Could not copy automatically — select the preview text below and copy it.";
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {

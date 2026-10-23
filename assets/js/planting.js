@@ -1,5 +1,5 @@
 /* ============================================================
-   True Tree Care — Planting guide by ZIP code
+   Seed — Planting guide by ZIP code
    ------------------------------------------------------------
    Resolves a ZIP to an approximate hardiness zone and planting
    region, then scores every species in the database against the
@@ -12,9 +12,9 @@
 (function () {
   "use strict";
 
-  var E = TTC.esc;
-  var SPECIES = window.TTC_SPECIES || [];
-  var ZONES = window.TTC_ZONES;
+  var E = SEED.esc;
+  var SPECIES = window.SEED_SPECIES || [];
+  var ZONES = window.SEED_ZONES;
 
   var state = { site: null, results: [], excluded: [] };
 
@@ -325,11 +325,11 @@
       };
 
       state.site = site;
-      TTC.store.set("lastZip", site.zip);
+      SEED.store.set("lastZip", site.zip);
       render(site, run(site));
     });
 
-    var last = TTC.store.get("lastZip", "");
+    var last = SEED.store.get("lastZip", "");
     if (last) document.getElementById("zip").value = last;
   }
 
